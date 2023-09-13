@@ -5,9 +5,9 @@ build:
 
 run: build
 	@./project
-	@ @xdg-open QR.ppm
+	
 valgrind: 
 	valgrind --leak-check=yes --track-origins=yes ./project
 
 clean:
-	rm project
+	rm project QR.ppm

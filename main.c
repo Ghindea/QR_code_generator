@@ -6,7 +6,7 @@ int main(int argc, char **argv)
         char **qr = initMatrix();
         // printMatrix(qr);
         makeQR(qr);
-        // system("go QR.ppm");
+        system("xdg-open QR.ppm");
     } else system("code config.h");
     
     return 0;

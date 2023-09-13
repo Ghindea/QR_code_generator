@@ -2,9 +2,10 @@
 #define version 2
 #define mask 5
 #define error_correction 2
+#define data_type 4
 // color parameters
 #define red 0
 #define green 0
-#define blue 0
+#define blue 250
 // file name
 #define file "QR.ppm"

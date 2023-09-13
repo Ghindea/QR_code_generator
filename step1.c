@@ -1,4 +1,26 @@
 #include "header.h"
+void apple_padding(char **matrix) {
+    for (int i = 0; i < 7; i++) {
+        for (int j = 0; j < 7; j++) {
+            if (i == 0 || i == 6 || j == 0 || j == 6) {
+                matrix[i][j] = 1;
+                matrix[size-1-i][j] = 1;
+                matrix[i][size-1-j] = 1;
+            }
+            if (i >= 2 && i <= 4 && j >= 2 && j <= 4) {
+                matrix[i][j] = 1;
+                matrix[size-1-i][j] = 1;
+                matrix[i][size-1-j] = 1;
+            }
+        }
+    }
+    for (int j = 7; j < size - 7; j++) {
+        if (j % 2 == 0) {
+            matrix[6][j] = 1;
+            matrix[j][6] = 1;
+        }
+    }
+}
 void apply_correction(char **matrix) {
     switch (error_correction) {
         case 1:
@@ -64,34 +86,36 @@ void apply_mask(char **matrix) {
         break;
     }
 }
-char **initMatrix() {
+void apply_data_type(char **matrix) {
+    switch (data_type)
+    {
+    case 1:
+        matrix[size-2][size-2] = 1;
+        break;
+    case 2:
+        matrix[size-2][size-1] = 1;
+        break;
+    case 3:
+        matrix[size-1][size-1] = 1;
+        break;
+    case 4:
+        matrix[size-1][size-2] = 1;
+        break;
+    default:
+        break;
+    }
+}
 
+char **initMatrix() {
+    /* memory alloc */
     char **qr_matrix = calloc(size, sizeof(char *));
     for (int i = 0; i < size; i++) {
         qr_matrix[i] = calloc(size, sizeof(char));
     }
-
-    for (int i = 0; i < 7; i++) {
-        for (int j = 0; j < 7; j++) {
-            if (i == 0 || i == 6 || j == 0 || j == 6) {
-                qr_matrix[i][j] = 1;
-                qr_matrix[size-1-i][j] = 1;
-                qr_matrix[i][size-1-j] = 1;
-            }
-            if (i >= 2 && i <= 4 && j >= 2 && j <= 4) {
-                qr_matrix[i][j] = 1;
-                qr_matrix[size-1-i][j] = 1;
-                qr_matrix[i][size-1-j] = 1;
-            }
-        }
-    }
-    for (int j = 7; j < size - 7; j++) {
-        if (j % 2 == 0) {
-            qr_matrix[6][j] = 1;
-            qr_matrix[j][6] = 1;
-        }
-    }
+    /* apply format*/
+    apple_padding(qr_matrix);
     apply_correction(qr_matrix);
     apply_mask(qr_matrix);
+    apply_data_type(qr_matrix);
     return qr_matrix;
 }

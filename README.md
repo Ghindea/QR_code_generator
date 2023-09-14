@@ -8,11 +8,12 @@ made by *Daniel Ghindea*
                 opens header file "config.h" to edit program parameters.
 
         - [version]: there are fixed configurations of QR code sizes that range from 1 to 40:
-                1: 21x21; can encode up to 25 alphanumeric characters
-                2: 25x25; can encode up to 47 alphanumeric characters
-                3: 29x29; can encode up to 77 alphanumeric characters
+                1: 21x21; can encode up to 17 ASCII characters
+                2: 25x25; can encode up to 32 ASCII characters
+                3: 29x29; can encode up to 53 ASCII characters
                 ...
-                40: 177x177; can encode up to 4926 alphanumeric characters
+                40: 177x177; can encode up to 2953 ASCII characters
+                (for more information about character capacities go [here](https://www.thonky.com/qr-code-tutorial/character-capacities))
                 
         - [mask]: certain patterns in the QR code matrix can make it difficult for QR code scanners to correctly read the code. to counteract this, the QR code specification defines 8 mask patterns:
                 0: (i*j) % 2 + (i*j) % 3 == 0

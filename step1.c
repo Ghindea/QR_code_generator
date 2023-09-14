@@ -1,5 +1,22 @@
 #include "header.h"
-void apple_padding(char **matrix) {
+void draw_alignment(int x, int y, char **matrix) {
+    if (matrix[x][y] == 1) return;
+    for (int i = -2; i <= 2; i++) {             // verificare spatiu gol
+        for (int j = -2; j <= 2; j++) {
+            if (matrix[x+i][y+j] == 1) return; 
+        }
+    }
+    matrix[x][y] = 1;
+    for (int i = -2; i <= 2; i++) {
+        matrix[x-2][y+i] = 1;
+        matrix[x+2][y+i] = 1;
+    }
+    for (int i = -1; i <= 1; i++) {
+        matrix[x+i][y-2] = 1;
+        matrix[x+i][y+2] = 1;
+    }
+}
+void apply_base(char **matrix) {    // finder patterns
     for (int i = 0; i < 7; i++) {
         for (int j = 0; j < 7; j++) {
             if (i == 0 || i == 6 || j == 0 || j == 6) {
@@ -14,14 +31,31 @@ void apple_padding(char **matrix) {
             }
         }
     }
-    for (int j = 7; j < size - 7; j++) {
-        if (j % 2 == 0) {
-            matrix[6][j] = 1;
-            matrix[j][6] = 1;
+}
+void apply_alignment(char **matrix) {
+    switch (version/7)
+    {
+        case 0: {                   // pentru versiunile 1-6 nu poate fi decat un alignment pattern
+            if (version == 1) break;// la cordonata (a,a), caci altfel se suprapune cu finding patternurile
+            int a = 18+(version-2)*4;
+            draw_alignment(a, a, matrix);
+            break;
         }
+        case 1: {                   // teoretic sunt 9 alignment patternuri, dar in practica ies 6
+            int a = 22+(version%7)*2, b = 18+(version-2)*4; // caci 3 se suprapun
+            int v[] = {6, a, b};
+            for (int i = 0; i <= 2; i++) {
+                for (int j = 0; j <= 2; j++) {
+                    draw_alignment(v[i],v[j],matrix);
+                }
+            }
+            break;
+        }
+        default:
+            break;
     }
 }
-void apply_correction(char **matrix) {
+void apply_correction(char **matrix) {      // error correction; dark module; timing pattern
     switch (error_correction) {
         case 1:
             matrix[8][1] = 1;
@@ -40,6 +74,13 @@ void apply_correction(char **matrix) {
         default:
             break;
     }
+    for (int j = 7; j < size - 7; j++) {
+        if (j % 2 == 0) {
+            matrix[6][j] = 1;
+            matrix[j][6] = 1;
+        }
+    }
+    matrix[size-8][8] = 1;
 }
 void apply_mask(char **matrix) {
     switch (mask)
@@ -113,7 +154,8 @@ char **initMatrix() {
         qr_matrix[i] = calloc(size, sizeof(char));
     }
     /* apply format*/
-    apple_padding(qr_matrix);
+    apply_base(qr_matrix);
+    apply_alignment(qr_matrix);
     apply_correction(qr_matrix);
     apply_mask(qr_matrix);
     apply_data_type(qr_matrix);

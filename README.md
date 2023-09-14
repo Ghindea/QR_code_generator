@@ -42,6 +42,6 @@ made by *Daniel Ghindea*
         - [file]: string that defines output file's name.
 
 ### `BIBLIOGRAPHY:`
-- [https://developers.google.com/chart/infographics/docs/qr_codes]
 - [https://www.thonky.com/qr-code-tutorial/]
 - [https://www.youtube.com/watch?v=142TGhaTMtI&t=95s]
+- [https://developers.google.com/chart/infographics/docs/qr_codes]

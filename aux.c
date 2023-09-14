@@ -1,6 +1,25 @@
 #include "header.h"
-void printMatrix(char **matrice) {
+#define COLOR_RED       "\x1b[31m"
+#define COLOR_RESET     "\x1b[0m"
+#define UNDERLINE       "\e[4m"
+#define BOLD            "\e[1m"
+#define COLOR_OFF       "\e[m"
 
+void error(int x) {
+    switch (x)
+    {
+        case 0: {
+            printf(COLOR_RED BOLD UNDERLINE "error:" COLOR_OFF 
+                    "  Input text is too long for the specified version of QR code.\n\t"
+                    "To edit QR version use --config option and check README.\n");
+        } 
+        break;
+        
+        default:
+            break;
+    }
+}
+void printMatrix(char **matrice) {
     for (int i = 0; i < size; i++) {
         // printf("%d ", i);
         for (int j = 0; j < size; j++) {
@@ -16,7 +35,7 @@ void makeQR(char **matrix) {
     unsigned char alb = 255, r = red, g = green, b = blue;
     for (int i = 0; i < size; i++) {
         for (int j = 0 ; j < size; j++) {
-            if (matrix[i][j]) {
+            if (matrix[i][j] == 1) {
                 fwrite(&r, sizeof(unsigned char), 1, out);
                 fwrite(&g, sizeof(unsigned char), 1, out);
                 fwrite(&b, sizeof(unsigned char), 1, out);

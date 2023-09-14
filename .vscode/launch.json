@@ -2,6 +2,25 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "(gdb) Launch",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "~/projects/qr_code/project",
+      "args": [],
+      "stopAtEntry": true,
+      "cwd": "~/projects/qr_code",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    },
+    {
       "name": "C/C++ Runner: Debug Session",
       "type": "cppdbg",
       "request": "launch",
@@ -9,7 +28,7 @@
       "stopAtEntry": false,
       "externalConsole": false,
       "cwd": "/home/ghindea/projects/qr_code",
-      "program": "/home/ghindea/projects/qr_code/build/Debug/outDebug",
+      "program": "/home/ghindea/projects/qr_code/project",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
@@ -20,5 +39,6 @@
         }
       ]
     }
-  ]
+  ],
+  "preLaunchTask": "build"
 }

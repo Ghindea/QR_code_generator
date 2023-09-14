@@ -13,8 +13,8 @@ made by *Daniel Ghindea*
                 3: 29x29; can encode up to 53 ASCII characters
                 ...
                 40: 177x177; can encode up to 2953 ASCII characters
-                (for more information about character capacities go [here](https://www.thonky.com/qr-code-tutorial/character-capacities))
-                
+                (currently only the first 13th versions are implemented | for more information about character capacities see [1])
+
         - [mask]: certain patterns in the QR code matrix can make it difficult for QR code scanners to correctly read the code. to counteract this, the QR code specification defines 8 mask patterns:
                 0: (i*j) % 2 + (i*j) % 3 == 0
                 1: (i/2 + j/3) % 2 == 0
@@ -30,19 +30,27 @@ made by *Daniel Ghindea*
                 1: level L - up to 7%
                 2: level H - up to 30%
                 3: level Q - up to 25% 
-                # [needs more research]
 
         - [data_type]: QR code can hold 4 different types of data:
-                1: numeric
-                2: alphanumeric
-                3: kanji
-                4: bytes
+                1: numeric              /* not implemented */
+                2: alphanumeric         /* not implemented */
+                3: bytes
+                4: kanji                /* not implemented */
         
         - the color of the QR code is determined by the given amount of red, green and blue color. their values range between 0 and 255.
 
         - [file]: string that defines output file's name.
 
+        *****************
+        note to myself: type
+                0: up
+                1: left
+                2: down
+        *****************
+---
+[1]: [character capacities by version](https://www.thonky.com/qr-code-tutorial/character-capacities)
+
+---
 ### `BIBLIOGRAPHY:`
-- [https://www.thonky.com/qr-code-tutorial/]
-- [https://www.youtube.com/watch?v=142TGhaTMtI&t=95s]
-- [https://developers.google.com/chart/infographics/docs/qr_codes]
+- [Thonky QR code tutorial](https://www.thonky.com/qr-code-tutorial/)
+- [James Explains QR code tutorial](https://www.youtube.com/watch?v=142TGhaTMtI&t=95s)

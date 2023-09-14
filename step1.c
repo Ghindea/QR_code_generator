@@ -6,7 +6,6 @@ void draw_alignment(int x, int y, char **matrix) {
             if (matrix[x+i][y+j] == 1) return; 
         }
     }
-    matrix[x][y] = 1;
     for (int i = -2; i <= 2; i++) {
         matrix[x-2][y+i] = 1;
         matrix[x+2][y+i] = 1;
@@ -15,6 +14,12 @@ void draw_alignment(int x, int y, char **matrix) {
         matrix[x+i][y-2] = 1;
         matrix[x+i][y+2] = 1;
     }
+    for (int i = -1; i <= 1; i++) {
+        for (int j = -1; j <= 1; j++) {
+                matrix[x+i][y+j] = 2;
+        }
+    }
+    matrix[x][y] = 1;
 }
 void apply_base(char **matrix) {    // finder patterns
     for (int i = 0; i < 7; i++) {
@@ -32,7 +37,7 @@ void apply_base(char **matrix) {    // finder patterns
         }
     }
 }
-void apply_alignment(char **matrix) {
+void apply_alignment(char **matrix) {   // alignment patterns versions 2->13
     switch (version/7)
     {
         case 0: {                   // pentru versiunile 1-6 nu poate fi decat un alignment pattern
@@ -55,8 +60,8 @@ void apply_alignment(char **matrix) {
             break;
     }
 }
-void apply_correction(char **matrix) {      // error correction; dark module; timing pattern
-    switch (error_correction) {
+void apply_format_pattern(char **matrix) {      // mask pattern; error correction level; dark module; timing pattern
+    switch (error_correction_level) {
         case 1:
             matrix[8][1] = 1;
             matrix[size-2][8] = 1;
@@ -81,8 +86,6 @@ void apply_correction(char **matrix) {      // error correction; dark module; ti
         }
     }
     matrix[size-8][8] = 1;
-}
-void apply_mask(char **matrix) {
     switch (mask)
     {
     case 1:
@@ -127,25 +130,6 @@ void apply_mask(char **matrix) {
         break;
     }
 }
-void apply_data_type(char **matrix) {
-    switch (data_type)
-    {
-    case 1:
-        matrix[size-2][size-2] = 1;
-        break;
-    case 2:
-        matrix[size-2][size-1] = 1;
-        break;
-    case 3:
-        matrix[size-1][size-1] = 1;
-        break;
-    case 4:
-        matrix[size-1][size-2] = 1;
-        break;
-    default:
-        break;
-    }
-}
 
 char **initMatrix() {
     /* memory alloc */
@@ -156,8 +140,6 @@ char **initMatrix() {
     /* apply format*/
     apply_base(qr_matrix);
     apply_alignment(qr_matrix);
-    apply_correction(qr_matrix);
-    apply_mask(qr_matrix);
-    apply_data_type(qr_matrix);
+    apply_format_pattern(qr_matrix);
     return qr_matrix;
 }

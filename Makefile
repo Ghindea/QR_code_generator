@@ -1,5 +1,5 @@
 CC = gcc
-#CFLAGS = -g -Wall -std=c11
+CFLAGS = -g -std=c11 #-Wall
 build:
 	@$(CC) *.c $(CFLAGS) -o project
 

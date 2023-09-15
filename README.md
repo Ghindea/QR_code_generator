@@ -2,6 +2,7 @@
 by [*Daniel Ghindea*](https://github.com/Ghindea)
 
 The QR Code is generated as a .ppm image and its properties (version, color, error_correction and more) are all customizable. A future version of this program will focus on generating a more versatile image format (.png, .jpg, etc.). Currently the program has been tested on Linux.
+
 To better understand how QR code is generated check [BIBLIOGRAPHY](#bibliography).
 
 Useful links [^2]

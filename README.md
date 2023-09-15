@@ -50,7 +50,7 @@ made by *Daniel Ghindea*
 - [James Explains QR code tutorial](https://www.youtube.com/watch?v=142TGhaTMtI&t=95s)
 
 ### LICENSE:
-published under MIT licence. for more information check LICENSE
+Content is published under [MIT Licence](https://en.wikipedia.org/wiki/MIT_License). For more information check LICENSE.md
 
 
 [^1]: [character capacities by version](https://www.thonky.com/qr-code-tutorial/character-capacities)

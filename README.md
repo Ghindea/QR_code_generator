@@ -1,6 +1,10 @@
-# **QR code generator**
-made by *Daniel Ghindea*
+# **QR Code Generator**
+by [*Daniel Ghindea*](https://github.com/Ghindea)
 
+The QR Code is generated as a .ppm image and its properties (version, color, error_correction and more) are all customizable. A future version of this program will focus on generating a more versatile image format (.png, .jpg, etc.). Currently the program has been tested on Linux.
+To better understand how QR code is generated check [BIBLIOGRAPHY](#bibliography).
+
+Useful links [^2]
 ###  SYNOPSIS:
         ./project [OPTION]
 ###  DESCRIPTION:
@@ -48,9 +52,11 @@ made by *Daniel Ghindea*
 ### BIBLIOGRAPHY:
 - [Thonky QR code tutorial](https://www.thonky.com/qr-code-tutorial/)
 - [James Explains QR code tutorial](https://www.youtube.com/watch?v=142TGhaTMtI&t=95s)
+- [Reed-Solomon error correction](https://en.wikipedia.org/wiki/Reed%E2%80%93Solomon_error_correction)
 
 ### LICENSE:
 Content is published under [MIT Licence](https://en.wikipedia.org/wiki/MIT_License). For more information check [LICENSE.md](https://github.com/Ghindea/QR_code_beta/blob/master/LICENSE.md)
 
-
+---
 [^1]: [character capacities by version](https://www.thonky.com/qr-code-tutorial/character-capacities)
+[^2]: [error correction table](https://www.thonky.com/qr-code-tutorial/error-correction-table)

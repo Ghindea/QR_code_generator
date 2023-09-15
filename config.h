@@ -6,7 +6,7 @@
 
 
 // QR properties
-#define version 3
+#define version 1
 #define mask 3
 #define error_correction_level 1
 #define data_type 3

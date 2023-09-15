@@ -1,10 +1,8 @@
 #include "header.h"
-#define COLOR_RED       "\x1b[31m"
-#define COLOR_RESET     "\x1b[0m"
-#define UNDERLINE       "\e[4m"
-#define BOLD            "\e[1m"
-#define COLOR_OFF       "\e[m"
-
+void bitprint(int n) {
+    if (!n) printf("0");
+        else printf("1");
+}
 void error(int x) {
     switch (x)
     {

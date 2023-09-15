@@ -1,12 +1,12 @@
 # **QR code generator**
 made by *Daniel Ghindea*
 
-###  `SYNOPSIS:`
+###  SYNOPSIS:
         ./project [OPTION]
-###  `DESCRIPTION:`
+###  DESCRIPTION:
         --config
                 opens header file "config.h" to edit program parameters.
-### `CONFIGURATION PARAMETERS:`
+### CONFIGURATION PARAMETERS:
 1. `version`: there are fixed configurations of QR code sizes that range from 1 to 40: (currently only the first 13th versions are implemented | for more information about character capacities see [^1])
 ```
         1: 21x21; can encode up to 17 ASCII characters
@@ -41,15 +41,15 @@ made by *Daniel Ghindea*
         3: bytes
         4: kanji                /* not implemented */
 ```        
-5. `the color` of the QR code is determined by the given amount of red, green and blue color. their values range between 0 and 255.
+5. `RGB` color of the QR code is determined by the given amount of red, green and blue color. their values range between 0 and 255.
 
 6. `file`: string that defines output file's name.
 
-### `BIBLIOGRAPHY:`
+### BIBLIOGRAPHY:
 - [Thonky QR code tutorial](https://www.thonky.com/qr-code-tutorial/)
 - [James Explains QR code tutorial](https://www.youtube.com/watch?v=142TGhaTMtI&t=95s)
 
-### `LICENSE:`
+### LICENSE:
 published under MIT licence. for more information check LICENSE
 
 

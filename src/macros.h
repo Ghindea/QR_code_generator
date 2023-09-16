@@ -1,5 +1,5 @@
 #pragma once
-#include "config.h"
+#include "config.h" // config file
 
 // input string maxlen for mem alloc depending on version
 #if version < 15    

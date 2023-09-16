@@ -54,6 +54,7 @@ Useful links [^2]
 - [Thonky QR code tutorial](https://www.thonky.com/qr-code-tutorial/)
 - [James Explains QR code tutorial](https://www.youtube.com/watch?v=142TGhaTMtI&t=95s)
 - [Reed-Solomon error correction](https://en.wikipedia.org/wiki/Reed%E2%80%93Solomon_error_correction)
+- [Polinomials](https://en.wikipedia.org/wiki/Polynomial_code)
 
 ### LICENSE:
 Content is published under [MIT Licence](https://en.wikipedia.org/wiki/MIT_License). For more information check [LICENSE.md](https://github.com/Ghindea/QR_code_beta/blob/master/LICENSE.md)

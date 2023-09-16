@@ -1,4 +1,5 @@
 #include "header.h"
+
 void bitprint(int n) {
     if (!n) printf("0");
         else printf("1");
@@ -45,3 +46,4 @@ void makeQR(char **matrix) {
         }
     }
 }
+

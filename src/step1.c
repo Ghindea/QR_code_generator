@@ -1,4 +1,5 @@
 #include "header.h"
+
 void draw_alignment(int x, int y, char **matrix) {
     if (matrix[x][y] == 1) return;
     for (int i = -2; i <= 2; i++) {             // verificare spatiu gol

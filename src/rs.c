@@ -1,4 +1,5 @@
 #include "header.h"
+
 void polyprint(polynomial P) {
     if (P.coef[P.grad] == 0) {printf("0\n"); return;}
     if (P.coef[P.grad] == 1) {
@@ -51,11 +52,7 @@ int * invert (int * a, int arr_size) {
 }
 tables load_gf256() {
     /*
-    *    The initial idea was to save table values into a load file and read it each time the program starts,
-    *    but that turned out to be a problem since i'm not sure the copy-pasted values are correct.
-    * 
-    *    Therefore, I came with this... 
-    *    (check https://en.wikiversity.org/wiki/Reed%E2%80%93Solomon_codes_for_coders#Multiplication_with_logarithms)
+    *    check https://en.wikiversity.org/wiki/Reed%E2%80%93Solomon_codes_for_coders#Multiplication_with_logarithms)
     */
     tables t;
     t._exp = (uchar *) calloc(512, sizeof(uchar));
@@ -75,6 +72,7 @@ tables load_gf256() {
 
     return t;
 }
+
 /* polynomial stuff */
 polynomial poly_init(int n, int * val) {
     polynomial P;

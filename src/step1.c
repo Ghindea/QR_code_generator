@@ -143,3 +143,4 @@ char **initMatrix() {
     apply_format_pattern(qr_matrix);
     return qr_matrix;
 }
+// dg

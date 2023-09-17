@@ -1,78 +1,163 @@
 #include "header.h"
-
-int max(int a, int b) {
-    return a>b?a:b;
+void polyprint(polynomial P) {
+    if (P.coef[P.grad] == 0) {printf("0\n"); return;}
+    if (P.coef[P.grad] == 1) {
+        if (P.grad == 1) {
+            printf("x ");
+        } else printf("x^%d ", P.grad);
+    } else if (P.grad == 1){
+        printf("%dx ", P.coef[P.grad]);
+    } else printf("%dx^%d ", P.coef[P.grad], P.grad);
+    for (int i = P.grad-1; i >= 0; i--) {
+        if (P.coef[i]) {
+            switch (i)
+            {
+            case 0:
+                printf("+ %d", P.coef[i]);
+                break;
+            case 1:
+                if (P.coef[i] == 1) printf("+ x ");
+                    else printf("+ %dx ", P.coef[i]);
+                break;
+            default:
+                if (P.coef[i] == 1) printf("+ x^%d ", i);
+                    else printf("+ %dx^%d ", P.coef[i], i);
+                break;
+            }
+        } else printf("+ 0");
+    }
+    printf("\n");
 }
-int min(int a, int b) {
-    return a<b?a:b;
+void normalise(polynomial * P) { // TO DO: realloc memory 
+    if (P->grad == 0) return;   // what could be normalised on a monomial? 
+
+    int first_zero = P->grad;
+    while (P->coef[first_zero] == 0) {
+        first_zero--;
+    }
+    if (first_zero != P->grad) {
+        // int *tmp = realloc(P->coef, (first_zero+1) * sizeof(int));   
+        // P->coef = tmp;
+        P->grad = first_zero;
+    }
+}
+
+int * invert (int * a, int arr_size) {
+    int * b = (int *)calloc(arr_size+1, sizeof(int));
+    for (int i = 0; i <= arr_size; i++) {
+        b[i] = a[arr_size - i];
+    }
+    return b;
+}
+tables load_gf256() {
+    /*
+    *    The initial idea was to save table values into a load file and read it each time the program starts,
+    *    but that turned out to be a problem since i'm not sure the copy-pasted values are correct.
+    * 
+    *    Therefore, I came with this... 
+    *    (check https://en.wikiversity.org/wiki/Reed%E2%80%93Solomon_codes_for_coders#Multiplication_with_logarithms)
+    */
+    tables t;
+    t._exp = (uchar *) calloc(512, sizeof(uchar));
+    t._log = (uchar *) calloc(256, sizeof(uchar));
+    int x = 1;
+    for (int i = 0; i < 256; i++) {
+        t._exp[i] = x;
+        t._log[x] = i;
+        x <<= 1;            // <=>  x *= 2;
+        if (x & 0x100) {    // <=>  x >= 256;
+            x ^= 0x11d;     // <=>  x %= 285;
+        }
+    }
+    for (int i = 255; i <= 512; i++) {
+        t._exp[i] = t._exp[i-255];
+    }
+
+    return t;
 }
 /* polynomial stuff */
-
-polynomial polinit(int n, unsigned char * val) {
+polynomial poly_init(int n, int * val) {
     polynomial P;
     P.grad = n;
     if (!val) {
-        P.coef = (unsigned char *)calloc(n+1, sizeof(unsigned char));
+        P.coef = (int *)calloc(n+1, sizeof(int));
     } else {
         P.coef = val;
     }
 
     return P;
 }
-polynomial poly_mul(polynomial P1, polynomial P2) {
-    int k = 0, mul = 0;
-    polynomial P3 = polinit(P1.grad + P2.grad, NULL);
-    for (int i = 0; i <= max(P1.grad,P2.grad); i++) {
-        for (int j = 0; j <= min(P1.grad,P2.grad); j++) {
-            k = i + j;
-            mul = P1.coef[i] * P2.coef[j];
-            if (mul > 255) {
-                mul = mul ^ 285;
-            }
-            P3.coef[k] = P3.coef[k] ^ mul;
-        }
+polynomial poly_sum(polynomial A, polynomial B) {
+    polynomial sum = poly_init(A.grad>B.grad?A.grad:B.grad, NULL);
+
+    for (int i = 0; i <= A.grad; i++) {
+        sum.coef[i + sum.grad - A.grad] = A.coef[i];
     }
+    for (int i = 0; i <= B.grad; i++) {
+        sum.coef[i + sum.grad - B.grad] ^= B.coef[i];
+    }
+    return sum;
+}
+polynomial poly_multiplication(polynomial P1, polynomial P2, tables t) {
+    polynomial P3 = poly_init(P1.grad + P2.grad, NULL);
+        for (int i = 0; i <= P1.grad; i++) {
+            for (int j = 0; j <= P2.grad; j++) {
+                if (P1.coef[i] && P2.coef[j]) {
+                    P3.coef[i+j] ^= t._exp[t._log[P1.coef[i]] + t._log[P2.coef[j]]];
+                } 
+            }
+        }
+    // normalise(&P3); // leading term must be non-zero
+
     return P3;
 }
-polynomial generator(int n) {
-    unsigned char *p = gf256();
-    unsigned char tmp[]={-p[0],1};
-    polynomial P = polinit(1,tmp), aux = polinit(1,NULL);
-    aux.coef[1] = 1;
-    for (int i = 1; i < n; i++) {
-        aux.coef[0] = -p[i];
-        P = poly_mul(P,aux);
+polynomial poly_division(polynomial P1, polynomial P2, tables t) {
+    polynomial A = poly_init(P1.grad,invert(P1.coef,P1.grad)),
+               B = poly_init(P2.grad,invert(P2.coef,P2.grad));
+    polynomial msg_out = A;
+    int normalizer = B.coef[0], coef = 0;
+    for (int i = 0; i <= (A.grad - B.grad); i++) {
+        msg_out.coef[i] /= normalizer;
+        coef = msg_out.coef[i]; 
+        if (coef) {
+            for (int j = 1; j <= B.grad; j++) {
+                if (B.coef[j]) {
+                    msg_out.coef[i + j] ^= t._exp[t._log[B.coef[j]] + t._log[coef]];
+                }
+            }
+        }
     }
+    int sep = msg_out.grad-B.grad;
+    polynomial remainder = poly_init(sep, msg_out.coef+sep+1);
+    remainder.coef = invert(remainder.coef, remainder.grad);
+    return remainder;
+}
+polynomial generator(int n) {
+    tables table = load_gf256();
+    int tmp[]={1};
+    polynomial P = poly_init(0,tmp), aux = poly_init(1,NULL);
+    aux.coef[1] = 1;
+    for (int i = 0; i < n; i++) {
+        aux.coef[0] = (int)table._exp[i] ;
+        P = poly_multiplication(P, aux, table);
+    }
+    // polynomial P = poly_init(n,NULL);
+    // for (int i = 0; i <= n; i++) {
+    //     int termen = 1;
+    //     for (int j = 0; j < i; j++) {
+    //         termen = (termen * 2) % 256;         // ChatGPT was given a chance. it failed...
+    //     }
+    //     P.coef[i] = termen;
+    // }
     return P;
 }
 
-unsigned char * gf256() {       // log table
-    unsigned char * v = (unsigned char *) calloc(256, sizeof(unsigned char));
-    unsigned int x = 1;
-    v[0] = 1;
-    for (int i = 0; i < 255; i++) {
-        x = x << 1;
-        if (x > 255) {
-            x = x ^ 285;
-        }
-        v[i+1] = (unsigned char) x;
-    }
-    return v;
-}
-unsigned char * antilog(unsigned char *v) {     // antilog table
-    unsigned char * alog = (unsigned char *) calloc(256, sizeof(unsigned char));
-    for (int i = 1; i <= 255; i++) {
-        for (int j = 0; j <= 255; j++) {
-            if (v[j] == i) alog[i] = j;
-        }
-    }
-    alog[1] = 0;
-    return alog;
-}
+polynomial reed_solomon(polynomial msg_in, int nerc) { // nerc = number of error correction codewords
+    tables t = load_gf256();
+    polynomial G = generator(nerc);
+    polynomial EC = poly_division(msg_in, G, t);
+    polynomial msg_out = poly_sum(msg_in, EC);
 
-void polyprint(polynomial P) {
-    for (int i = 0; i < P.grad; i++) {
-        printf("%dx^%d+", P.coef[i], i);
-    }
-    printf("%dx^%d\n", P.coef[P.grad], P.grad);
-}
+    return msg_out;
+} 
+// dg

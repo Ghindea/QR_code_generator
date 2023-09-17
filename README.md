@@ -3,7 +3,9 @@ by [*Daniel Ghindea*](https://github.com/Ghindea)
 
 The QR Code is generated as a .ppm image and its properties (version, color, error_correction and more) are all customizable. A future version of this program will focus on generating a more versatile image format (.png, .jpg, etc.). Currently the program has been tested on Linux.
 
-To better understand how QR code is generated check [BIBLIOGRAPHY](#bibliography).
+Check [ZXing C++](https://github.com/zxing-cpp/zxing-cpp).
+
+To better understand how QR code is generated see the [BIBLIOGRAPHY](#bibliography).
 
 Useful links [^2]
 ###  SYNOPSIS:
@@ -52,8 +54,9 @@ Useful links [^2]
 
 ### BIBLIOGRAPHY:
 - [Thonky QR code tutorial](https://www.thonky.com/qr-code-tutorial/)
+- [Reed-Solomon EC](https://en.wikipedia.org/wiki/Reed%E2%80%93Solomon_error_correction)
+- [Reed-Solomon CFC](https://en.wikiversity.org/wiki/Reed%E2%80%93Solomon_codes_for_coders)
 - [James Explains QR code tutorial](https://www.youtube.com/watch?v=142TGhaTMtI&t=95s)
-- [Reed-Solomon error correction](https://en.wikipedia.org/wiki/Reed%E2%80%93Solomon_error_correction)
 - [Polinomials](https://en.wikipedia.org/wiki/Polynomial_code)
 
 ### LICENSE:

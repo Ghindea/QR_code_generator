@@ -22,7 +22,7 @@ void draw_alignment(int x, int y, char **matrix) {
     }
     matrix[x][y] = 1;
 }
-void apply_base(char **matrix) {    // finder patterns
+void apply_base(char **matrix) {    // finder patterns; timing pattern; dark module
     for (int i = 0; i < 7; i++) {
         for (int j = 0; j < 7; j++) {
             if (i == 0 || i == 6 || j == 0 || j == 6) {
@@ -37,6 +37,13 @@ void apply_base(char **matrix) {    // finder patterns
             }
         }
     }
+    for (int j = 7; j < size - 7; j++) {
+        if (j % 2 == 0) {
+            matrix[6][j] = 1;
+            matrix[j][6] = 1;
+        }
+    }
+    matrix[size-8][8] = 1;
 }
 void apply_alignment(char **matrix) {   // alignment patterns versions 2->13
     switch (version/7)
@@ -61,76 +68,6 @@ void apply_alignment(char **matrix) {   // alignment patterns versions 2->13
             break;
     }
 }
-void apply_format_pattern(char **matrix) {      // mask pattern; error correction level; dark module; timing pattern
-    switch (error_correction_level) {
-        case 1:
-            matrix[8][1] = 1;
-            matrix[size-2][8] = 1;
-            break;
-        case 2:
-            matrix[8][0] = 1;
-            matrix[size-1][8] = 1;
-            break;
-        case 3:
-            matrix[8][1] = 1;
-            matrix[size-2][8] = 1;
-            matrix[8][0] = 1;
-            matrix[size-1][8] = 1;
-            break;
-        default:
-            break;
-    }
-    for (int j = 7; j < size - 7; j++) {
-        if (j % 2 == 0) {
-            matrix[6][j] = 1;
-            matrix[j][6] = 1;
-        }
-    }
-    matrix[size-8][8] = 1;
-    switch (mask)
-    {
-    case 1:
-        matrix[8][4] = 1;
-        matrix[size-5][8] = 1;
-        break;
-    case 2:
-        matrix[8][3] = 1;
-        matrix[size-4][8] = 1;
-        break;
-    case 3:
-        matrix[8][4] = 1;
-        matrix[size-5][8] = 1;
-        matrix[8][3] = 1;
-        matrix[size-4][8] = 1;
-        break;
-    case 4:
-        matrix[8][2] = 1;
-        matrix[size-3][8] = 1;
-        break;
-    case 5:
-        matrix[8][2] = 1;
-        matrix[size-3][8] = 1;
-        matrix[8][4] = 1;
-        matrix[size-5][8] = 1;
-        break;
-    case 6:
-        matrix[8][2] = 1;
-        matrix[size-3][8] = 1;
-        matrix[8][3] = 1;
-        matrix[size-4][8] = 1;
-        break;
-    case 7:
-        matrix[8][4] = 1;
-        matrix[size-5][8] = 1;
-        matrix[8][3] = 1;
-        matrix[size-4][8] = 1;
-        matrix[8][2] = 1;
-        matrix[size-3][8] = 1;
-        break;
-    default:
-        break;
-    }
-}
 
 char **initMatrix() {
     /* memory alloc */
@@ -141,7 +78,6 @@ char **initMatrix() {
     /* apply format*/
     apply_base(qr_matrix);
     apply_alignment(qr_matrix);
-    apply_format_pattern(qr_matrix);
     return qr_matrix;
 }
 // dg

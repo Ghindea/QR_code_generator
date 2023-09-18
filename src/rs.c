@@ -25,7 +25,7 @@ void polyprint(polynomial P) {
                     else printf("+ %dx^%d ", P.coef[i], i);
                 break;
             }
-        } else printf("+ 0");
+        } // else printf("+ 0");
     }
     printf("\n");
 }
@@ -43,13 +43,6 @@ void normalise(polynomial * P) { // TO DO: realloc memory
     }
 }
 
-int * invert (int * a, int arr_size) {
-    int * b = (int *)calloc(arr_size+1, sizeof(int));
-    for (int i = 0; i <= arr_size; i++) {
-        b[i] = a[arr_size - i];
-    }
-    return b;
-}
 tables load_gf256() {
     /*
     *    check https://en.wikiversity.org/wiki/Reed%E2%80%93Solomon_codes_for_coders#Multiplication_with_logarithms)
@@ -110,24 +103,26 @@ polynomial poly_multiplication(polynomial P1, polynomial P2, tables t) {
     return P3;
 }
 polynomial poly_division(polynomial P1, polynomial P2, tables t) {
-    polynomial A = poly_init(P1.grad,invert(P1.coef,P1.grad)),
-               B = poly_init(P2.grad,invert(P2.coef,P2.grad));
-    polynomial msg_out = A;
-    int normalizer = B.coef[0], coef = 0;
-    for (int i = 0; i <= (A.grad - B.grad); i++) {
+    invert_int_array(P1.coef, P1.grad);
+    invert_int_array(P2.coef, P2.grad);
+
+    polynomial msg_out = P1;
+    int normalizer = P2.coef[0], coef = 0;
+    for (int i = 0; i <= (P1.grad - P2.grad); i++) {
         msg_out.coef[i] /= normalizer;
         coef = msg_out.coef[i]; 
         if (coef) {
-            for (int j = 1; j <= B.grad; j++) {
-                if (B.coef[j]) {
-                    msg_out.coef[i + j] ^= t._exp[t._log[B.coef[j]] + t._log[coef]];
+            for (int j = 1; j <= P2.grad; j++) {
+                if (P2.coef[j]) {
+                    msg_out.coef[i + j] ^= t._exp[t._log[P2.coef[j]] + t._log[coef]];
                 }
             }
         }
     }
-    int sep = msg_out.grad-B.grad;
+    int sep = msg_out.grad-P2.grad;
     polynomial remainder = poly_init(sep, msg_out.coef+sep+1);
-    remainder.coef = invert(remainder.coef, remainder.grad);
+    invert_int_array(remainder.coef, remainder.grad);
+
     return remainder;
 }
 polynomial generator(int n) {
@@ -150,12 +145,18 @@ polynomial generator(int n) {
     return P;
 }
 
-polynomial reed_solomon(polynomial msg_in, int nerc) { // nerc = number of error correction codewords
-    tables t = load_gf256();
-    polynomial G = generator(nerc);
-    polynomial EC = poly_division(msg_in, G, t);
-    polynomial msg_out = poly_sum(msg_in, EC);
+polynomial reed_solomon(polynomial M, int nerc) {       // nerc = number of error correction codewords
+    tables t = load_gf256();                            // exponential and logarithmic values in GF(256)
+    polynomial G = generator(nerc);                     // generator polynomial
 
-    return msg_out;
+    int *aux_coef = (int *)calloc(nerc+1, sizeof(int));
+    aux_coef[nerc] = 1;                                 // To make sure that the exponent of the lead term
+    polynomial aux = poly_init(nerc, aux_coef);         // doesn't become too small during the division, multiply
+    M = poly_multiplication(M, aux, t);                 // the message polynomial by x^n
+
+    polynomial EC = poly_division(M, G, t);             // error correction polynomial
+    // polynomial msg_out = poly_sum(M, EC);            // encoded message
+
+    return EC;
 } 
 // dg

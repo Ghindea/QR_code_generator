@@ -9,11 +9,15 @@ void error(int x) {
     {
         case 0: {
             printf(COLOR_RED BOLD UNDERLINE "error:" COLOR_OFF 
-                    "  Input text is too long for the specified version of QR code.\n\t"
+                    "  Input text is too long for the specified version of QR code!\n\t"
                     "To edit QR version use --config option and check README.\n");
         } 
         break;
-        
+        case 404: {
+            printf(COLOR_RED BOLD UNDERLINE "error:" COLOR_OFF 
+                    "  Could not allocate enough memory!\n");
+        }
+        break;
         default:
             break;
     }
@@ -47,3 +51,24 @@ void makeQR(char **matrix) {
     }
 }
 
+void invert_int_array (int * arr, int end) {
+    int tmp, start = 0;
+    while (start <= end) {
+        tmp = arr[start];
+        arr[start] = arr[end];
+        arr[end] = tmp;
+        start++; end--;
+    }
+}
+uchar * invert_uchar_array (uchar * a, int arr_size) {
+    uchar * b = (uchar *)calloc(arr_size+1, sizeof(uchar));
+    for (int i = 0; i <= arr_size; i++) {
+        b[i] = a[arr_size - i];
+    }
+    return b;
+}
+
+int _is_set(char oct, int bit) {
+    if (oct & (1 << bit)) return 1;
+        else return 0;
+}

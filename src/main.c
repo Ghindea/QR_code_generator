@@ -9,6 +9,7 @@ int main(int argc, char **argv)
         if (ok) {
             makeQR(qr);
             system("xdg-open QR.ppm");
+            // printMatrix(qr);
         }
     } else system("code config.h");
     return 0;

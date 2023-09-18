@@ -65,88 +65,142 @@ int available(char **qr, char x, char y) {        // checks if module coordonate
     if (x > size-9 && x < size && y > -1 && y < 9) return 2;// find pttrn dwn left
     if (x > -1 && x < 9 && y > size-9 && y < size) return 2;// find pttrn up right
     if (qr[x][y]) return 0;                     // format pttrn
-    if (y == 6) return 0;
+    if (y == 6 || x == 6) return 0;
 
     return 1;
 }
-void position_up(char *prev, char *x, char *y) {
+void position_up(int *prev, char *x, char *y) {
     if ((*prev) % 2 != 0) {
         (*x)--; (*y)++;
     } else (*y)--;
     (*prev)++;
 }
-void position_down(char *prev, char *x, char *y) {
+void position_down(int *prev, char *x, char *y) {
     if ((*prev) % 2 != 0) {
         (*x)++; (*y)++;
     } else (*y)--;
     (*prev)++;
 }
-void load_group(char **qr, char *x, char *y, char *prev, char *type, int val, char bit_nr) {
-    int i = bit_nr-1, msk = 1;
+void load_group(char **qr, _bit_coord_ *bit, int val) {
+    int i = 7, msk = 1;
     // prev % 2 == 0 -> left 
     // prev % 2 == 1 -> upper-right/down-right
     while (i >= 0) {
-        if (*type == 1 && available(qr, *x, *y) == 2) {
-            (*x)++; *y -= 2; *type = 2;
+        if (bit->type == 1 && available(qr, bit->x, bit->y) == 2) {
+            (bit->x)++; bit->y -= 2; bit->type = 2;
         }
-        if (*type == 2 && available(qr, *x, *y) == 2) {
-            (*x)--; (*y) -= 2; *type = 1;
+        if (bit->type == 2 && available(qr, bit->x, bit->y) == 2) {
+            bit->x--; bit->y -= 2; bit->type = 1;
         }
-        if (available(qr, *x, *y) == 1){
+        if (available(qr, bit->x, bit->y) == 1){
             msk = 1 << i;
-            if (msk & val) qr[*x][*y] = 1;
-            bitprint(msk&val);
+            if (msk & val) qr[bit->x][bit->y] = 1;
             i--;
         } 
-        if (*type == 1) position_up(prev, x, y);   // type == 1 -> up
-            else position_down(prev, x, y);        // type == 2 -> down
+        if (bit->x == size - 1 && bit->y == 9) {
+            bit->x = size - 9; bit->y--; bit->type = 1; 
+            bit->prev = 0;
+        } else  if (bit->x == 9 && bit->y == 7) {
+            bit->y -= 2; bit->type = 2; bit->prev = 0;
+        } else  if (bit->type == 1) position_up(&bit->prev, &bit->x, &bit->y);  // type == 1 -> up
+            else position_down(&bit->prev, &bit->x, &bit->y);                   // type == 2 -> down
     }
-    printf(" ");
+
 }
 
+/* 
+*   ===============     ===============     ======= ...
+*   7 6 5 4 3 2 1 0		7 6 5 4 3 2 1 0		7 6 5 4 ...		
+*   0 1 0 0 0 0 0 0		1 0 1 1 0 0 1 0 	1 0 1 1 ... 
+*   ======= =================== =================== ===...
+*   first 4 		next 8 bits	 next 8*(len-1) bits
+*	bits encode		encode the		encode the string
+*	the data type 	string len
+*/
+uchar * data_codewords(char *msg_in, int codewords) {
+
+    uchar * data = (uchar *) calloc(codewords, sizeof(uchar)), _mask = 1;
+    data[0] = 1 << (data_type + 3);     // data_type 
+	int byte = 0;   // byte_old
+	for (int i = len_bit_no()-1; i >= 0; i--) { // len
+        _mask = 1 << i;
+        _mask &= (strlen(msg_in)-1);
+        if (i == 3) byte++;
+        if (i >= 4) {
+            _mask >>= 4;
+        } else {
+            _mask <<=4;
+        }
+        data[byte] ^= _mask;
+    }
+    int k = 4 + len_bit_no();
+    int new = k % 8, old = 0;
+    int byte_old = strlen(msg_in)-2, byte_new = byte_old + 1  + (k/8);
+    for (int i = 1; i <= (strlen(msg_in)-1)*8; i++) {
+        if (_is_set(msg_in[byte_old], old)) {
+            data[byte_new] |= 1 << new;     // set bit
+        } else {
+            data[byte_new] &= ~(1 << new);   // unset bit
+        }
+        old++; new++;
+        if (new > 7) {new %= 8; byte_new--;}
+        if (old > 7) {old %= 8; byte_old--;}
+    }
+    byte = 236;
+    for (int i = strlen(msg_in) + k/8;  i <= codewords; i++) {
+        data[i] = byte;
+        if (byte % 2 == 0) byte = 17;
+            else byte = 236;
+    }
+    // data = invert_uchar_array(data, codewords);
+
+	return data;
+}
+int * convert_to_INT(uchar *v) {
+	int * w = (int *) calloc(strlen(v)-1,sizeof(int));
+	for (int i = 0; i < strlen(v); i++) {
+		w[i] = (int) v[i];
+	}
+	return w;
+}
+
+
 int fill_data(char **matrix) {
-    FILE *in = fopen("utils/byte_mode_capacity.txt", "r");
+    FILE *in  = fopen(mode_path, "r");
     FILE *fin = fopen("utils/data_codewords_capacity.txt", "r");
+    FILE *cin = fopen("utils/ec_codewords_capacity.txt","r");
 
-    int capacity = load_capacity_data(in), codewords = load_capacity_data(fin); // check thonky QR code tutorial to understand (link in README)
-    
-    char x = size - 1, y = size - 1, type = 1, prev = 0; 
-    char *string = (char *)calloc(MAXLEN, sizeof(char));
-    fgets(string, MAXLEN, stdin);
-    printf("%ld\n", strlen(string)-1);
-    if (strlen(string)-1 <= capacity) {
-        load_group(matrix, &x, &y, &prev, &type, 1 << (data_type - 1), 4); // load data type
-        load_group(matrix, &x, &y, &prev, &type, strlen(string) - 1, len_bit_no());   // load string len
-        for (int i = 0; i < strlen(string) - 1; i++) {
-            load_group(matrix, &x, &y, &prev, &type, string[i], 8);
-        }
-        load_group(matrix, &x, &y, &prev, &type, 0, 4);
+	int codewords = load_capacity_data(fin);
+    int capacity = load_capacity_data(in); 
+    _bit_coord_ bit = {.x = size - 1, .y = size-1, .type = 1, .prev = 0}; 
 
-        int data_len = (strlen(string) - 1) * 8 + 4 + len_bit_no();
-        if (data_len % 8) {
-            load_group(matrix, &x, &y, &prev, &type, 0, data_len % 8);
-            data_len += data_len % 8;
-        }
-        int ok = 0;
-        while (data_len < codewords * 8) {
-            if (!ok) {
-                load_group(matrix, &x, &y, &prev, &type, 236, 8);
-                ok = 1;
-            } else {
-                load_group(matrix, &x, &y, &prev, &type, 17, 8);
-                ok = 0;
-            } 
-            data_len += 8;
-        }
+    uchar *msg_in = (uchar *)calloc(MAXLEN, sizeof(uchar));
+    fgets(msg_in, MAXLEN, stdin);
+
+    if (strlen(msg_in)-1 <= capacity) {
         
+        uchar * data_string = data_codewords(msg_in, codewords);
+      
+        for (int i = 0; i < codewords; i++) {
+            load_group(matrix, &bit, data_string[i]);
+        }
+    
+        int * int_data_string = convert_to_INT(data_string);
+        invert_int_array(int_data_string, codewords-1);
+        
+		polynomial M = poly_init(codewords-1, int_data_string);   // message polynomial
+        int ECcodewords = load_capacity_data(cin);
+        polynomial encoded = reed_solomon(M, ECcodewords);
+        polyprint(encoded);
+        for (int i = 0; i < ECcodewords; i++) {                        // EC polynomial
+            load_group(matrix, &bit, encoded.coef[i]);
+        }
 
+        // mask_matrix(matrix, encoded);
 
-        printf("\n%d %d\n", data_len, codewords*8);
         return 1;
-    } else {
-        error(0);
-        return 0;
-    } 
+
+    } else { error(0); return 0; } 
     
 }
 // dg

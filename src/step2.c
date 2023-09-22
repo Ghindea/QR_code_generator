@@ -157,6 +157,8 @@ uchar * data_codewords(char *msg_in, unsigned codewords) {
 
 	return data;
 }
+
+/* This function passes ownership of the allocated array */
 int* convert_to_INT(const uchar* v, unsigned v_size)
 {
 	int * w = (int *) calloc(v_size,sizeof(int));
@@ -180,7 +182,7 @@ int fill_data(char **matrix) {
 
     _bit_coord_ bit = {.x = size - 1, .y = size-1, .type = 1, .prev = 0}; 
 
-    uchar *msg_in = (uchar *)calloc(MAXLEN, sizeof(uchar));
+    char *msg_in = (char *)calloc(MAXLEN, sizeof(char)); // NOTE (radubig): changed type to `char` from `uchar` because you read the message from stdin
     fgets(msg_in, MAXLEN, stdin);
 
     if (strlen(msg_in)-1 <= capacity) {
@@ -206,7 +208,8 @@ int fill_data(char **matrix) {
         fclose(cin);
 
         // free memory
-        free(M.coef);
+        free(int_data_string);
+        free(msg_in);
 
         return 1;
 

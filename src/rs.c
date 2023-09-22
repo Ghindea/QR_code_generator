@@ -67,7 +67,7 @@ tables load_gf256() {
 }
 
 /* polynomial stuff */
-/* This function passes ownership of the allocated polynomial */
+/* This function passes ownership of the allocated polynomial if val == NULL */
 polynomial poly_init(int n, int * val) {
     polynomial P;
     P.grad = n;
@@ -79,6 +79,8 @@ polynomial poly_init(int n, int * val) {
 
     return P;
 }
+
+/* This function passes ownership of the allocated polynomial */
 polynomial poly_sum(polynomial A, polynomial B) {
     polynomial sum = poly_init(A.grad>B.grad?A.grad:B.grad, NULL);
 
@@ -169,7 +171,6 @@ polynomial reed_solomon(polynomial M, int nerc) {       // nerc = number of erro
     // Don't forget to free memory after you no longer need it!
     free(t._exp);
     free(t._log);
-    free(G.coef);
     free(aux_coef);
 
     return EC;

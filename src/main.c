@@ -3,7 +3,7 @@
 int main(int argc, char **argv)
 {
     if (!argv[1]) {
-        char **qr = initMatrix();
+        char **qr = initMatrix();  // NOTE: this memory is never freed
         // printMatrix(qr);
         int ok = fill_data(qr);
         if (ok) {

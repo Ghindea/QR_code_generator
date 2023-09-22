@@ -51,16 +51,16 @@ tables load_gf256() {
     t._exp = (uchar *) calloc(512, sizeof(uchar));
     t._log = (uchar *) calloc(256, sizeof(uchar));
     unsigned x = 1;
-    for (int i = 0; i < 256; i++) {
+    for (int i = 0; i < 255; i++) {
         t._exp[i] = x;
         t._log[x] = i;
         x <<= 1;            // <=>  x *= 2;
-        if (x & 0x100) {    // <=>  x >= 256; NOTE (radubig): this looks sketchy but i won't touch it
+        if (x & 0x100) {    // <=>  x >= 256;
             x ^= 0x11d;     // <=>  x %= 285;
         }
     }
-    for (int i = 256; i < 512; i++) {  // NOTE (radubig): another memory leak fixed here
-        t._exp[i] = t._exp[i-256];     // NOTE (radubig): i think you meant 256 here
+    for (int i = 255; i < 512; i++) {
+        t._exp[i] = t._exp[i-255];
     }
 
     return t;

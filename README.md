@@ -14,7 +14,7 @@ Useful links [^2]
         --config
                 opens header file "config.h" to edit program parameters.
 ### CONFIGURATION PARAMETERS:
-1. `version`: there are fixed configurations of QR code sizes that range from 1 to 40: (currently only the first 13th versions are implemented | for more information about character capacities see [^1])
+1. `version`: there are fixed configurations of QR code sizes that range from 1 to 40: (currently only the first version is implemented | for more information about character capacities see [^1])
 ```
         1: 21x21; can encode up to 17 ASCII characters
         2: 25x25; can encode up to 32 ASCII characters
@@ -52,6 +52,8 @@ Useful links [^2]
 
 6. `file`: string that defines output file's name.
 
+### CONTRIBUTORS:
+Thanks to [radubig](https://github.com/radubig) for fixing memory leaks and overview.
 ### BIBLIOGRAPHY:
 - [Thonky QR code tutorial](https://www.thonky.com/qr-code-tutorial/)
 - [Reed-Solomon EC](https://en.wikipedia.org/wiki/Reed%E2%80%93Solomon_error_correction)

@@ -6,8 +6,8 @@
 
 
 // QR properties
-#define version 12
-#define error_correction_level 3
+#define version 1
+#define error_correction_level 1
 #define data_type 3
 // color parameters
 #define red 0

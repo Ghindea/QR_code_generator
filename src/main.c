@@ -9,7 +9,7 @@ int main(int argc, char **argv)
         if (ok) {
             makeQR(qr);
 #ifdef __linux__
-            system("xviewer QR.ppm");   // It's better to remove system calls altogether
+            system("xdg-open QR.ppm");   // It's better to remove system calls altogether
 #else
             printf("QR code saved in file \"%s\"", file);
 #endif

@@ -125,19 +125,29 @@ polynomial poly_division(polynomial P1, polynomial P2, tables t) {
         }
     }
     int sep = msg_out.grad-P2.grad;
-    polynomial remainder = poly_init(sep, msg_out.coef+sep+1);
+    //polynomial remainder = poly_init(sep, msg_out.coef+sep+1);
+    polynomial remainder = poly_init(P2.grad - 1, msg_out.coef+sep+1);
     invert_int_array(remainder.coef, remainder.grad);
 
     return remainder;
 }
 polynomial generator(int n) {
     tables table = load_gf256();
-    int tmp[]={1};
-    polynomial P = poly_init(0,tmp), aux = poly_init(1,NULL);
+    //int tmp[]={1};
+    //polynomial P = poly_init(0,tmp);
+    polynomial P;
+    P.grad = 0;
+    P.coef = calloc(1, sizeof(int));
+    P.coef[0] = 1;
+
+    polynomial aux = poly_init(1,NULL);
     aux.coef[1] = 1;
+
     for (int i = 0; i < n; i++) {
         aux.coef[0] = (int)table._exp[i] ;
-        P = poly_multiplication(P, aux, table);
+        polynomial P_aux = poly_multiplication(P, aux, table);
+        free(P.coef);
+        P = P_aux;
     }
     // polynomial P = poly_init(n,NULL);
     // for (int i = 0; i <= n; i++) {

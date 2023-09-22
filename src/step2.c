@@ -196,7 +196,7 @@ int fill_data(char **matrix) {
         int * int_data_string = convert_to_INT(data_string, codewords);
         invert_int_array(int_data_string, codewords-1);
         
-		polynomial M = poly_init(codewords-1, int_data_string);   // message polynomial
+		polynomial M = poly_init(codewords - 1, int_data_string);   // message polynomial
         unsigned ECcodewords = load_capacity_data(cin);
         polynomial encoded = reed_solomon(M, ECcodewords);
         polyprint(encoded);

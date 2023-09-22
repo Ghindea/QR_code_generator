@@ -147,7 +147,7 @@ uchar * data_codewords(char *msg_in, int codewords) {
         if (old > 7) {old %= 8; byte_old--;}
     }
     byte = 236;
-    for (int i = strlen(msg_in) + k/8;  i <= codewords; i++) {
+    for (int i = strlen(msg_in) + k/8;  i < codewords; i++) {
         data[i] = byte;
         if (byte % 2 == 0) byte = 17;
             else byte = 236;
@@ -171,7 +171,11 @@ int fill_data(char **matrix) {
     FILE *cin = fopen("utils/ec_codewords_capacity.txt","r");
 
 	int codewords = load_capacity_data(fin);
-    int capacity = load_capacity_data(in); 
+    int capacity = load_capacity_data(in);
+
+    fclose(in);
+    fclose(fin);
+
     _bit_coord_ bit = {.x = size - 1, .y = size-1, .type = 1, .prev = 0}; 
 
     uchar *msg_in = (uchar *)calloc(MAXLEN, sizeof(uchar));
@@ -197,7 +201,7 @@ int fill_data(char **matrix) {
         }
 
         // mask_matrix(matrix, encoded);
-
+        fclose(cin);
         return 1;
 
     } else { error(0); return 0; } 

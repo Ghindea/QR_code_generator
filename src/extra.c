@@ -49,6 +49,7 @@ void makeQR(char **matrix) {
             }
         }
     }
+    fclose(out);
 }
 
 void invert_int_array (int * arr, int end) {

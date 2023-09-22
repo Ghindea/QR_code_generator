@@ -3,14 +3,18 @@
 int main(int argc, char **argv)
 {
     if (!argv[1]) {
-        char **qr = initMatrix();
+        char **qr = initMatrix();  // NOTE: this memory is never freed
         // printMatrix(qr);
         int ok = fill_data(qr);
         if (ok) {
             makeQR(qr);
-            system("xdg-open QR.ppm");
+#ifdef __linux__
+            system("xviewer QR.ppm");   // It's better to remove system calls altogether
+#else
+            printf("QR code saved in file \"%s\"", file);
+#endif
             // printMatrix(qr);
         }
-    } else system("code config.h");
+    } else system("code config.h");  // same here
     return 0;
 }

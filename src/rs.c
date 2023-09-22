@@ -50,8 +50,8 @@ tables load_gf256() {
     tables t;
     t._exp = (uchar *) calloc(512, sizeof(uchar));
     t._log = (uchar *) calloc(256, sizeof(uchar));
-    int x = 1;
-    for (int i = 0; i < 256; i++) {
+    unsigned x = 1;
+    for (int i = 0; i < 255; i++) {
         t._exp[i] = x;
         t._log[x] = i;
         x <<= 1;            // <=>  x *= 2;
@@ -59,7 +59,7 @@ tables load_gf256() {
             x ^= 0x11d;     // <=>  x %= 285;
         }
     }
-    for (int i = 255; i <= 512; i++) {
+    for (int i = 255; i < 512; i++) {
         t._exp[i] = t._exp[i-255];
     }
 
@@ -67,6 +67,7 @@ tables load_gf256() {
 }
 
 /* polynomial stuff */
+/* This function passes ownership of the allocated polynomial if val == NULL */
 polynomial poly_init(int n, int * val) {
     polynomial P;
     P.grad = n;
@@ -78,6 +79,8 @@ polynomial poly_init(int n, int * val) {
 
     return P;
 }
+
+/* This function passes ownership of the allocated polynomial */
 polynomial poly_sum(polynomial A, polynomial B) {
     polynomial sum = poly_init(A.grad>B.grad?A.grad:B.grad, NULL);
 
@@ -89,6 +92,8 @@ polynomial poly_sum(polynomial A, polynomial B) {
     }
     return sum;
 }
+
+/* This function passes ownership of the allocated polynomial */
 polynomial poly_multiplication(polynomial P1, polynomial P2, tables t) {
     polynomial P3 = poly_init(P1.grad + P2.grad, NULL);
         for (int i = 0; i <= P1.grad; i++) {
@@ -120,19 +125,29 @@ polynomial poly_division(polynomial P1, polynomial P2, tables t) {
         }
     }
     int sep = msg_out.grad-P2.grad;
-    polynomial remainder = poly_init(sep, msg_out.coef+sep+1);
+    //polynomial remainder = poly_init(sep, msg_out.coef+sep+1);
+    polynomial remainder = poly_init(P2.grad - 1, msg_out.coef+sep+1);
     invert_int_array(remainder.coef, remainder.grad);
 
     return remainder;
 }
 polynomial generator(int n) {
     tables table = load_gf256();
-    int tmp[]={1};
-    polynomial P = poly_init(0,tmp), aux = poly_init(1,NULL);
+    //int tmp[]={1};
+    //polynomial P = poly_init(0,tmp);
+    polynomial P;
+    P.grad = 0;
+    P.coef = calloc(1, sizeof(int));
+    P.coef[0] = 1;
+
+    polynomial aux = poly_init(1,NULL);
     aux.coef[1] = 1;
+
     for (int i = 0; i < n; i++) {
         aux.coef[0] = (int)table._exp[i] ;
-        P = poly_multiplication(P, aux, table);
+        polynomial P_aux = poly_multiplication(P, aux, table);
+        free(P.coef);
+        P = P_aux;
     }
     // polynomial P = poly_init(n,NULL);
     // for (int i = 0; i <= n; i++) {
@@ -142,6 +157,12 @@ polynomial generator(int n) {
     //     }
     //     P.coef[i] = termen;
     // }
+
+    // I'm sure ChatGPT would also free some memory here
+    free(table._exp);
+    free(table._log);
+    free(aux.coef);
+
     return P;
 }
 
@@ -156,6 +177,11 @@ polynomial reed_solomon(polynomial M, int nerc) {       // nerc = number of erro
 
     polynomial EC = poly_division(M, G, t);             // error correction polynomial
     // polynomial msg_out = poly_sum(M, EC);            // encoded message
+
+    // Don't forget to free memory after you no longer need it!
+    free(t._exp);
+    free(t._log);
+    free(aux_coef);
 
     return EC;
 } 

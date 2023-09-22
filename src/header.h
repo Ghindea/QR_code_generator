@@ -40,5 +40,5 @@ void bitprint(int);         //
 void error(int);            //
 void printMatrix(char **);  //
 void makeQR(char **);       // auxiliary functions (extra.c)
-void invert_int_array (int *, int);
+void invert_int_array (int* arr, unsigned int end);
 uchar * invert_uchar_array (uchar *, int);

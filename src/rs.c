@@ -50,23 +50,24 @@ tables load_gf256() {
     tables t;
     t._exp = (uchar *) calloc(512, sizeof(uchar));
     t._log = (uchar *) calloc(256, sizeof(uchar));
-    int x = 1;
+    unsigned x = 1;
     for (int i = 0; i < 256; i++) {
         t._exp[i] = x;
         t._log[x] = i;
         x <<= 1;            // <=>  x *= 2;
-        if (x & 0x100) {    // <=>  x >= 256;
+        if (x & 0x100) {    // <=>  x >= 256; NOTE (radubig): this looks sketchy but i won't touch it
             x ^= 0x11d;     // <=>  x %= 285;
         }
     }
-    for (int i = 255; i <= 512; i++) {
-        t._exp[i] = t._exp[i-255];
+    for (int i = 256; i < 512; i++) {  // NOTE (radubig): another memory leak fixed here
+        t._exp[i] = t._exp[i-256];     // NOTE (radubig): i think you meant 256 here
     }
 
     return t;
 }
 
 /* polynomial stuff */
+/* This function passes ownership of the allocated polynomial */
 polynomial poly_init(int n, int * val) {
     polynomial P;
     P.grad = n;
@@ -89,6 +90,8 @@ polynomial poly_sum(polynomial A, polynomial B) {
     }
     return sum;
 }
+
+/* This function passes ownership of the allocated polynomial */
 polynomial poly_multiplication(polynomial P1, polynomial P2, tables t) {
     polynomial P3 = poly_init(P1.grad + P2.grad, NULL);
         for (int i = 0; i <= P1.grad; i++) {
@@ -142,6 +145,12 @@ polynomial generator(int n) {
     //     }
     //     P.coef[i] = termen;
     // }
+
+    // I'm sure ChatGPT would also free some memory here
+    free(table._exp);
+    free(table._log);
+    free(aux.coef);
+
     return P;
 }
 
@@ -156,6 +165,12 @@ polynomial reed_solomon(polynomial M, int nerc) {       // nerc = number of erro
 
     polynomial EC = poly_division(M, G, t);             // error correction polynomial
     // polynomial msg_out = poly_sum(M, EC);            // encoded message
+
+    // Don't forget to free memory after you no longer need it!
+    free(t._exp);
+    free(t._log);
+    free(G.coef);
+    free(aux_coef);
 
     return EC;
 } 

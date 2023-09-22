@@ -26,7 +26,7 @@ char len_bit_no() {         // determines len encoding length based on data type
         break;
     }
 }
-int load_capacity_data(FILE *in) {
+unsigned int load_capacity_data(FILE *in) {
     int x = 0;
     for (int i = 1; i < version; i++) {
         fscanf(in, "%d", &x);   // L
@@ -117,9 +117,10 @@ void load_group(char **qr, _bit_coord_ *bit, int val) {
 *	bits encode		encode the		encode the string
 *	the data type 	string len
 */
-uchar * data_codewords(char *msg_in, int codewords) {
+uchar * data_codewords(char *msg_in, unsigned codewords) {
 
-    uchar * data = (uchar *) calloc(codewords, sizeof(uchar)), _mask = 1;
+    uchar * data = (uchar *) calloc(codewords + 1, sizeof(uchar));  // alocate extra byte for null character
+    uchar _mask = 1;
     data[0] = 1 << (data_type + 3);     // data_type 
 	int byte = 0;   // byte_old
 	for (int i = len_bit_no()-1; i >= 0; i--) { // len
@@ -156,9 +157,10 @@ uchar * data_codewords(char *msg_in, int codewords) {
 
 	return data;
 }
-int * convert_to_INT(uchar *v) {
-	int * w = (int *) calloc(strlen(v)-1,sizeof(int));
-	for (int i = 0; i < strlen(v); i++) {
+int* convert_to_INT(const uchar* v, unsigned v_size)
+{
+	int * w = (int *) calloc(v_size,sizeof(int));
+	for (int i = 0; i < v_size; i++) {
 		w[i] = (int) v[i];
 	}
 	return w;
@@ -170,8 +172,8 @@ int fill_data(char **matrix) {
     FILE *fin = fopen("utils/data_codewords_capacity.txt", "r");
     FILE *cin = fopen("utils/ec_codewords_capacity.txt","r");
 
-	int codewords = load_capacity_data(fin);
-    int capacity = load_capacity_data(in);
+	unsigned codewords = load_capacity_data(fin);
+    unsigned capacity = load_capacity_data(in);
 
     fclose(in);
     fclose(fin);
@@ -189,11 +191,11 @@ int fill_data(char **matrix) {
             load_group(matrix, &bit, data_string[i]);
         }
     
-        int * int_data_string = convert_to_INT(data_string);
+        int * int_data_string = convert_to_INT(data_string, codewords);
         invert_int_array(int_data_string, codewords-1);
         
 		polynomial M = poly_init(codewords-1, int_data_string);   // message polynomial
-        int ECcodewords = load_capacity_data(cin);
+        unsigned ECcodewords = load_capacity_data(cin);
         polynomial encoded = reed_solomon(M, ECcodewords);
         polyprint(encoded);
         for (int i = 0; i < ECcodewords; i++) {                        // EC polynomial
@@ -202,6 +204,10 @@ int fill_data(char **matrix) {
 
         // mask_matrix(matrix, encoded);
         fclose(cin);
+
+        // free memory
+        free(M.coef);
+
         return 1;
 
     } else { error(0); return 0; } 

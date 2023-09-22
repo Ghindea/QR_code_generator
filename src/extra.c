@@ -52,8 +52,9 @@ void makeQR(char **matrix) {
     fclose(out);
 }
 
-void invert_int_array (int * arr, int end) {
-    int tmp, start = 0;
+void invert_int_array (int * arr, unsigned int end) {
+    int tmp;
+    unsigned start = 0;
     while (start <= end) {
         tmp = arr[start];
         arr[start] = arr[end];

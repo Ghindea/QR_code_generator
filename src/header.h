@@ -33,7 +33,8 @@ void normalise(polynomial *);
 /* multi file functions*/
 char **initMatrix();                   // step 1
 int fill_data(char **);                // step 2
-void mask_matrix(char **, polynomial); // step 3
+void mask_matrix(char **);             // step 3
+void apply_format(char **, int);       // step 4
 
 int _is_set(char, int);
 void bitprint(int);         //

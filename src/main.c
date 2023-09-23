@@ -7,14 +7,16 @@ int main(int argc, char **argv)
         // printMatrix(qr);
         int ok = fill_data(qr);
         if (ok) {
+            mask_matrix(qr);
             makeQR(qr);
-#ifdef __linux__
-            system("xdg-open QR.ppm");   // It's better to remove system calls altogether
-#else
-            printf("QR code saved in file \"%s\"", file);
-#endif
-            // printMatrix(qr);
+            system("xdg-open QR.ppm");
         }
     } else system("code config.h");  // same here
     return 0;
 }
+// #ifdef __linux__
+//             system("xdg-open QR.ppm");   // It's better to remove system calls altogether
+// #else
+//             printf("QR code saved in file \"%s\"", file);
+// #endif
+//             // printMatrix(qr);

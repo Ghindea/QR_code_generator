@@ -1,3 +1,4 @@
+![Header](./QR.png)
 # **QR Code Generator**
 by [*Daniel Ghindea*](https://github.com/Ghindea)
 
@@ -25,14 +26,14 @@ Useful links [^2]
 
 2. `mask`: certain patterns in the QR code matrix can make it difficult for QR code scanners to correctly read the code. to counteract this, the QR code specification defines 8 mask patterns:
 ```
-        0: (i*j) % 2 + (i*j) % 3 == 0
-        1: (i/2 + j/3) % 2 == 0
-        2: [(i*j) % 3 + i + j] % 2 == 0
-        3: [(i*j) % 3 + i*j ] % 2 == 0
-        4: i % 2 == 0
-        5: (i + j) % 2 == 0
-        6: (i + j) % 3 == 0
-        7: j % 3 == 0
+        0: (i + j) % 2 == 0
+        1: i % 2 == 0
+        2: j % 3 == 0
+        3: (i + j) % 3 == 0
+        4: (i/2 + j/3) % 2 == 0
+        5: (i*j) % 2 + (i*j) % 3 == 0
+        6: [(i*j) % 3 + i*j ] % 2 == 0
+        7: [(i*j) % 3 + i + j] % 2 == 0
 ```
 3. `error_correction`: there are 4 levels of error correction that helps QR code to stay readable even if some pixels can't be recognised by the scanner:
 ```
@@ -54,6 +55,7 @@ Useful links [^2]
 
 ### CONTRIBUTORS:
 Thanks to [radubig](https://github.com/radubig) for fixing memory leaks and overview.
+
 ### BIBLIOGRAPHY:
 - [Thonky QR code tutorial](https://www.thonky.com/qr-code-tutorial/)
 - [Reed-Solomon EC](https://en.wikipedia.org/wiki/Reed%E2%80%93Solomon_error_correction)

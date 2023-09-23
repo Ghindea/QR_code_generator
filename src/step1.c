@@ -8,19 +8,19 @@ void draw_alignment(int x, int y, char **matrix) {
         }
     }
     for (int i = -2; i <= 2; i++) {
-        matrix[x-2][y+i] = 1;
-        matrix[x+2][y+i] = 1;
+        matrix[x-2][y+i] = 3;
+        matrix[x+2][y+i] = 3;
     }
     for (int i = -1; i <= 1; i++) {
-        matrix[x+i][y-2] = 1;
-        matrix[x+i][y+2] = 1;
+        matrix[x+i][y-2] = 3;
+        matrix[x+i][y+2] = 3;
     }
     for (int i = -1; i <= 1; i++) {
         for (int j = -1; j <= 1; j++) {
                 matrix[x+i][y+j] = 2;
         }
     }
-    matrix[x][y] = 1;
+    matrix[x][y] = 3;
 }
 void apply_base(char **matrix) {    // finder patterns; timing pattern; dark module
     for (int i = 0; i < 7; i++) {

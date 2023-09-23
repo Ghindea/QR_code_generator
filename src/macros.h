@@ -9,6 +9,7 @@
 #else
 #define MAXLEN 3000
 #endif
+
 // path to loadable file depending on data type
 #if data_type == 1  
 #define mode_path "utils/numeric_mode_capacity.txt"
@@ -19,6 +20,7 @@
 #else
 #define mode_path "utils/kanji_mode_capacity.txt"
 #endif
+
 // color format to display
 #define COLOR_RED       "\x1b[31m"
 #define COLOR_RESET     "\x1b[0m"

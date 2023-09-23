@@ -60,12 +60,12 @@ unsigned int load_capacity_data(FILE *in) {
 }
 int available(char **qr, char x, char y) {        // checks if module coordonates are available to place data
     char aux = size;
-    if (x < 0 || x >= aux || y < 0 || y >=aux) return 2;  // matrix limits
+    if (x < 0 || x >= aux || y < 0 || y >=aux) return 2;    // matrix limits
     if (x > -1 && x < 9 && y >-1 && y < 9) return 2;        // find pttrn up left
     if (x > size-9 && x < size && y > -1 && y < 9) return 2;// find pttrn dwn left
     if (x > -1 && x < 9 && y > size-9 && y < size) return 2;// find pttrn up right
-    if (qr[x][y]) return 0;                     // format pttrn
-    if (y == 6 || x == 6) return 0;
+    if (qr[x][y]) return 0;                                 // format pttrn + alignment pttrn
+    if (y == 6 || x == 6) return 0;                         // timing pttrn
 
     return 1;
 }
@@ -188,7 +188,11 @@ int fill_data(char **matrix) {
     if (strlen(msg_in)-1 <= capacity) {
         
         uchar * data_string = data_codewords(msg_in, codewords);
-      
+        // printf("%d: ", codewords);
+        // for (int i = 0; i < codewords; i++) {
+        //     printf("%d,", data_string[i]);
+        // } printf("\n");
+
         for (int i = 0; i < codewords; i++) {
             load_group(matrix, &bit, data_string[i]);
         }
@@ -199,12 +203,11 @@ int fill_data(char **matrix) {
 		polynomial M = poly_init(codewords - 1, int_data_string);   // message polynomial
         unsigned ECcodewords = load_capacity_data(cin);
         polynomial encoded = reed_solomon(M, ECcodewords);
-        polyprint(encoded);
-        for (int i = 0; i < ECcodewords; i++) {                        // EC polynomial
+        // polyprint(encoded);
+        for (int i = ECcodewords-1; i >= 0; i--) {                        // EC polynomial
             load_group(matrix, &bit, encoded.coef[i]);
         }
 
-        // mask_matrix(matrix, encoded);
         fclose(cin);
 
         // free memory

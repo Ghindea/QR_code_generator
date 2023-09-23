@@ -34,19 +34,47 @@ void printMatrix(char **matrice) {
 void makeQR(char **matrix) {
     FILE *out = fopen(file, "w+");
     fprintf(out, "P6\n");
-    fprintf(out, "%d %d\n255\n", size, size);
+    fprintf(out, "%d %d\n255\n", 2*scale + scale * size, 2*scale + scale * size);
     uchar alb = 255, r = red, g = green, b = blue;
+    for (int i = 1; i <= scale; i++) {
+        for (int j = 1; j <= 2*scale + scale * size; j++) {
+            fwrite(&alb, sizeof(uchar), 1, out);
+            fwrite(&alb, sizeof(uchar), 1, out);
+            fwrite(&alb, sizeof(uchar), 1, out);
+        }
+    }
     for (int i = 0; i < size; i++) {
-        for (int j = 0 ; j < size; j++) {
-            if (matrix[i][j] == 1) {
-                fwrite(&r, sizeof(uchar), 1, out);
-                fwrite(&g, sizeof(uchar), 1, out);
-                fwrite(&b, sizeof(uchar), 1, out);
-            } else {
+        for (int k = 1; k <= scale; k++) {
+            for (int m = 1; m <= scale; m++) {
                 fwrite(&alb, sizeof(uchar), 1, out);
                 fwrite(&alb, sizeof(uchar), 1, out);
                 fwrite(&alb, sizeof(uchar), 1, out);
             }
+            for (int j = 0 ; j < size; j++) {
+                for (int l = 1; l <= scale; l++) {
+                    if (matrix[i][j] % 2) {
+                        fwrite(&r, sizeof(uchar), 1, out);
+                        fwrite(&g, sizeof(uchar), 1, out);
+                        fwrite(&b, sizeof(uchar), 1, out);
+                    } else {
+                        fwrite(&alb, sizeof(uchar), 1, out);
+                        fwrite(&alb, sizeof(uchar), 1, out);
+                        fwrite(&alb, sizeof(uchar), 1, out);
+                    }
+                }
+            }
+            for (int m = 1; m <= scale; m++) {
+                fwrite(&alb, sizeof(uchar), 1, out);
+                fwrite(&alb, sizeof(uchar), 1, out);
+                fwrite(&alb, sizeof(uchar), 1, out);
+            }
+        }
+    }
+    for (int i = 1; i <= scale; i++) {
+        for (int j = 1; j <= 2*scale + scale * size; j++) {
+            fwrite(&alb, sizeof(uchar), 1, out);
+            fwrite(&alb, sizeof(uchar), 1, out);
+            fwrite(&alb, sizeof(uchar), 1, out);
         }
     }
     fclose(out);
@@ -74,3 +102,4 @@ int _is_set(char oct, int bit) {
     if (oct & (1 << bit)) return 1;
         else return 0;
 }
+

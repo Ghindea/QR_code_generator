@@ -66,6 +66,7 @@ void apply_format(char **qr, int mask) {
         qr[i][8] = format_string[14-i] - '0';
     }
 
+    fclose(din);
     // free memory
     free(format_string);
 }

@@ -9,16 +9,10 @@ int main(int argc, char **argv)
         if (ok) {
             mask_matrix(qr);
             makeQR(qr);
-            system("xdg-open QR.ppm");
+            system("xdg-open QR.ppm");  // TODO: find cross-compatible alternative (if possible)
         }
 
         free_matrix(qr);
-    } else system("code config.h");  // same here
+    } else system("code config.h");  // TODO: implement runtime configuration
     return 0;
 }
-// #ifdef __linux__
-//             system("xdg-open QR.ppm");   // It's better to remove system calls altogether
-// #else
-//             printf("QR code saved in file \"%s\"", file);
-// #endif
-//             // printMatrix(qr);

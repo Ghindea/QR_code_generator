@@ -73,8 +73,10 @@ polynomial poly_init(int n, int * val) {
     P.grad = n;
     if (!val) {
         P.coef = (int *)calloc(n+1, sizeof(int));
+        P.is_heap_alloc = 1;
     } else {
         P.coef = val;
+        P.is_heap_alloc = 0;
     }
 
     return P;
@@ -133,11 +135,8 @@ polynomial poly_division(polynomial P1, polynomial P2, tables t) {
 }
 polynomial generator(int n) {
     tables table = load_gf256();
-    //int tmp[]={1};
-    //polynomial P = poly_init(0,tmp);
-    polynomial P;
-    P.grad = 0;
-    P.coef = calloc(1, sizeof(int));
+
+    polynomial P = poly_init(0, NULL);
     P.coef[0] = 1;
 
     polynomial aux = poly_init(1,NULL);
@@ -146,7 +145,7 @@ polynomial generator(int n) {
     for (int i = 0; i < n; i++) {
         aux.coef[0] = (int)table._exp[i] ;
         polynomial P_aux = poly_multiplication(P, aux, table);
-        free(P.coef);
+        free_polynomial(&P);
         P = P_aux;
     }
     // polynomial P = poly_init(n,NULL);
@@ -158,10 +157,9 @@ polynomial generator(int n) {
     //     P.coef[i] = termen;
     // }
 
-    // I'm sure ChatGPT would also free some memory here
-    free(table._exp);
-    free(table._log);
-    free(aux.coef);
+    // free memory
+    free_tables(&table);
+    free_polynomial(&aux);
 
     return P;
 }
@@ -178,10 +176,10 @@ polynomial reed_solomon(polynomial M, int nerc) {       // nerc = number of erro
     polynomial EC = poly_division(M, G, t);             // error correction polynomial
     // polynomial msg_out = poly_sum(M, EC);            // encoded message
 
-    // Don't forget to free memory after you no longer need it!
-    free(t._exp);
-    free(t._log);
+    // free memory
+    free_tables(&t);
     free(aux_coef);
+    free_polynomial(&G);
 
     return EC;
 } 

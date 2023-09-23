@@ -17,6 +17,7 @@ typedef struct {
 typedef struct poly{
     int grad;   // gradul polinomului
     int *coef;  // vector coeficienti
+    int is_heap_alloc;
 }polynomial;
 typedef struct {
     uchar *_exp, *_log;
@@ -30,8 +31,13 @@ polynomial reed_solomon(polynomial, int);
 void polyprint(polynomial);
 void normalise(polynomial *);
 
+/* custom free functions */
+void free_polynomial(polynomial* poly);
+void free_tables(tables* table);
+
 /* multi file functions*/
 char **initMatrix();                   // step 1
+void free_matrix(char **);
 int fill_data(char **);                // step 2
 void mask_matrix(char **);             // step 3
 void apply_format(char **, int);       // step 4

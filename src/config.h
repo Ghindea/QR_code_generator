@@ -6,7 +6,7 @@
 
 
 // QR properties
-#define version 1
+#define version 5   // MAX 5 (for now)
 #define error_correction_level 1
 #define data_type 3
 #define mask_type 1
@@ -16,4 +16,4 @@
 #define blue 0
 // file name
 #define file "QR.ppm"
-#define scale 20
+#define scale 5

@@ -80,4 +80,11 @@ char **initMatrix() {
     apply_alignment(qr_matrix);
     return qr_matrix;
 }
+
+void free_matrix(char** qr_matrix)
+{
+    for(int i = 0; i < size; i++)
+        free(qr_matrix[i]);
+    free(qr_matrix);
+}
 // dg

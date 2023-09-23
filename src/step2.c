@@ -176,13 +176,15 @@ int fill_data(char **matrix) {
 
 	unsigned codewords = load_capacity_data(fin);
     unsigned capacity = load_capacity_data(in);
+    unsigned ECcodewords = load_capacity_data(cin);
 
     fclose(in);
     fclose(fin);
+    fclose(cin);
 
     _bit_coord_ bit = {.x = size - 1, .y = size-1, .type = 1, .prev = 0}; 
 
-    char *msg_in = (char *)calloc(MAXLEN, sizeof(char)); // NOTE (radubig): changed type to `char` from `uchar` because you read the message from stdin
+    char *msg_in = (char *)calloc(MAXLEN, sizeof(char));
     fgets(msg_in, MAXLEN, stdin);
 
     if (strlen(msg_in)-1 <= capacity) {
@@ -201,22 +203,36 @@ int fill_data(char **matrix) {
         invert_int_array(int_data_string, codewords-1);
         
 		polynomial M = poly_init(codewords - 1, int_data_string);   // message polynomial
-        unsigned ECcodewords = load_capacity_data(cin);
         polynomial encoded = reed_solomon(M, ECcodewords);
         // polyprint(encoded);
         for (int i = ECcodewords-1; i >= 0; i--) {                        // EC polynomial
             load_group(matrix, &bit, encoded.coef[i]);
         }
 
-        fclose(cin);
-
         // free memory
         free(int_data_string);
         free(msg_in);
+        free(data_string);
 
         return 1;
 
-    } else { error(0); return 0; } 
+    } else {
+        free(msg_in);
+        error(0);
+        return 0;
+    }
     
+}
+
+void free_polynomial(polynomial* poly)
+{
+    if(poly->is_heap_alloc)
+        free(poly->coef);
+}
+
+void free_tables(tables* table)
+{
+    free(table->_log);
+    free(table->_exp);
 }
 // dg

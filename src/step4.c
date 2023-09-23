@@ -1,4 +1,5 @@
 #include "header.h"
+
 char * load_format(FILE *din, int mask) {
     char * string = (char *) calloc(18, sizeof(char));
     switch (error_correction_level)
@@ -11,14 +12,14 @@ char * load_format(FILE *din, int mask) {
             fscanf(din, "%s", string);
         }
         fscanf(din, "%s", string);
-        return string;
+        //return string;
         break;
     case 1:
         for (int i = 0; i < mask; i++) {
             fscanf(din, "%s", string);
         }
         fscanf(din, "%s", string);
-        return string;
+        //return string;
         break;
     case 2:
         for (int i = 1; i <= 24; i++) {
@@ -28,7 +29,7 @@ char * load_format(FILE *din, int mask) {
             fscanf(din, "%s", string);
         }
         fscanf(din, "%s", string);
-        return string;
+        //return string;
         break;
     case 3:
         for (int i = 1; i <= 16; i++) {
@@ -38,12 +39,14 @@ char * load_format(FILE *din, int mask) {
             fscanf(din, "%s", string);
         }
         fscanf(din, "%s", string);
-        return string;
+        //return string;
         break;
     default:
         break;
     }
+    return string;
 }
+
 void apply_format(char **qr, int mask) {
     FILE *din = fopen("utils/format_information_string.txt", "r");
     char *format_string = load_format(din, mask);
@@ -62,4 +65,7 @@ void apply_format(char **qr, int mask) {
     for (int i = 0; i <= 5; i++) {
         qr[i][8] = format_string[14-i] - '0';
     }
+
+    // free memory
+    free(format_string);
 }

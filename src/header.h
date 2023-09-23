@@ -3,7 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "macros.h"         // file for #defines
+#include "macros.h"
+
 /* calculate QR code size*/
 #define size 21 + (version - 1) * 4
 #define uchar unsigned char 
@@ -48,4 +49,3 @@ void error(int);            //
 void printMatrix(char **);  //
 void makeQR(char **);       // auxiliary functions (extra.c)
 void invert_int_array (int* arr, unsigned int end);
-uchar * invert_uchar_array (uchar *, int);

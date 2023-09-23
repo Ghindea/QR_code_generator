@@ -14,5 +14,6 @@ int main(int argc, char **argv)
 
         free_matrix(qr);
     } else system("code config.h");  // TODO: implement runtime configuration
+    
     return 0;
 }

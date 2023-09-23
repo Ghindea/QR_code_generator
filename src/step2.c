@@ -153,7 +153,6 @@ uchar * data_codewords(char *msg_in, unsigned codewords) {
         if (byte % 2 == 0) byte = 17;
             else byte = 236;
     }
-    // data = invert_uchar_array(data, codewords);
 
 	return data;
 }
@@ -167,7 +166,6 @@ int* convert_to_INT(const uchar* v, unsigned v_size)
 	}
 	return w;
 }
-
 
 int fill_data(char **matrix) {
     FILE *in  = fopen(mode_path, "r");
@@ -202,7 +200,7 @@ int fill_data(char **matrix) {
         int * int_data_string = convert_to_INT(data_string, codewords);
         invert_int_array(int_data_string, codewords-1);
         
-		polynomial M = poly_init(codewords - 1, int_data_string);   // message polynomial
+		polynomial M = poly_init(codewords - 1, int_data_string);         // message polynomial
         polynomial encoded = reed_solomon(M, ECcodewords);
         // polyprint(encoded);
         for (int i = ECcodewords-1; i >= 0; i--) {                        // EC polynomial
@@ -229,7 +227,6 @@ void free_polynomial(polynomial* poly)
     if(poly->is_heap_alloc)
         free(poly->coef);
 }
-
 void free_tables(tables* table)
 {
     free(table->_log);

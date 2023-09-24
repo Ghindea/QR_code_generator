@@ -3,10 +3,13 @@
 //        to understand how each variable works check README.md
 // ***************************************************************************
 
-
+// step 1: apply QR patterns
+// step 2: populate QR with data
+// step 3: apply mask
+// step 4: apply format patterns
 
 // QR properties
-#define version 5   // MAX 5 (for now)
+#define version 3
 #define error_correction_level 1
 #define data_type 3
 #define mask_type 1

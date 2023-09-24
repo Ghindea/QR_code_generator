@@ -14,6 +14,14 @@ typedef struct {
     int prev;
 }_bit_coord_;
 
+typedef struct {
+    int G1, G2;     // num of blocks in group 1 and group 2
+    int B1, B2;     // num of data codewords in each of group 1's and group 2's blocks
+    int EC;         // num of error correction codewords per block
+    int **data_blocks;     // array of data codewords sequences    (data_blocks[i] <=> block i)
+    int **ec_blocks;       // array of error correction codewords sequences corresponding to each block
+}_groups_;
+
 /* polynomials */
 typedef struct poly{
     int grad;   // gradul polinomului

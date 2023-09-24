@@ -12,13 +12,13 @@
 
 // path to loadable file depending on data type
 #if data_type == 1  
-#define mode_path "utils/numeric_mode_capacity.txt"
+#define mode_path "utils/type/numeric_mode_capacity.txt"
 #elif data_type == 2
-#define mode_path "utils/alphanumeric_mode_capacity.txt"
+#define mode_path "utils/type/alphanumeric_mode_capacity.txt"
 #elif data_type == 3
-#define mode_path "utils/byte_mode_capacity.txt"
+#define mode_path "utils/type/byte_mode_capacity.txt"
 #else
-#define mode_path "utils/kanji_mode_capacity.txt"
+#define mode_path "utils/type/kanji_mode_capacity.txt"
 #endif
 
 // color format to display

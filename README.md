@@ -22,7 +22,7 @@ Useful links [^2]
         --config
                 opens header file "config.h" to edit program parameters.
 ### CONFIGURATION PARAMETERS:
-1. `version`: there are fixed configurations of QR code sizes that range from 1 to 40: (only the first version is currently implemented | for more information about character capacities see [^1])
+1. `version`: there are fixed configurations of QR code sizes that range from 1 to 40: 
 ```
         1: 21x21; can encode up to 17 ASCII characters
         2: 25x25; can encode up to 32 ASCII characters
@@ -30,7 +30,8 @@ Useful links [^2]
         ...
         40: 177x177; can encode up to 2953 ASCII characters
 ```                
-
+Currently only versions 1 (full), 2(full), 3 (L,M), 4 (L), 5 (L) are implemented. For more information about character capacities see [^1]
+      
 2. `mask`: certain patterns in the QR code matrix can make it difficult for QR code scanners to correctly read the code. to counteract this, the QR code specification defines 8 mask patterns:
 ```
         0: (i + j) % 2 == 0

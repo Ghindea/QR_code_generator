@@ -166,21 +166,76 @@ int* convert_to_INT(const uchar* v, unsigned v_size)
 	}
 	return w;
 }
+// void alloc_groups(_groups_ *segments) {
+//     segments->group1_blocks = (int **) calloc(segments->G1, sizeof(int *));
+//     for (int i = 0; i < segments->G1; i++) {
+//         segments->group1_blocks[i] = (int *) calloc(segments->B1, sizeof(int));
+//     }
+//    
+//     if (segments->G2) {
+//         segments->group2_blocks = (int **) calloc(segments->G2, sizeof(int *));
+//         for (int i = 0; i < segments->G1; i++) {
+//             segments->group2_blocks[i] = (int *) calloc(segments->B2, sizeof(int));
+//         }
+//     }
+// }
+// void separate_blocks(int *data_string, _groups_ *segments) {
+//     int cont = 0;
+//     for (int i = 0; i < segments->G1; i++) {
+//         for (int j = 0; j < segments->B1; j++) {
+//             segments->group1_blocks[i][j] = data_string[cont++];
+//         }
+//     }
+//     for (int i = 0; i < segments->G2; i++) {
+//         for (int j = 0; j < segments->B2; j++) {
+//             segments->group2_blocks[i][j] = data_string[cont++];
+//         }
+//     }
+// }
+_groups_ alloc_groups(int ec_no) {
+    _groups_ seg;
+
+    FILE *ain = fopen("utils/groups/blocks_no_G1.txt","r");
+    FILE *bin = fopen("utils/groups/codewords_no_in_G1_blocks.txt","r");
+    FILE *cin = fopen("utils/groups/blocks_no_G2.txt","r");
+    FILE *din = fopen("utils/groups/codewords_no_in_G2_blocks.txt","r");
+
+    seg.G1 = load_capacity_data(ain);   // number of blocks in G1
+    seg.B1 = load_capacity_data(bin);   // number of codewords for each of G1's block
+    seg.G2 = load_capacity_data(cin);   // number of blocks in G2
+    seg.B2 = load_capacity_data(din);   // number of codewords for each of G2's block
+
+    /* alloc space for data codewords*/
+    seg.data_blocks = (int **) calloc(seg.G1 + seg.G2, sizeof(int *));
+    for (int i = 0; i < seg.G1 + seg.G2; i++) {
+        seg.data_blocks[i] = (int *) calloc(seg.B1 > seg.B2 ? seg.B1:seg.B2, sizeof(int));
+    }
+
+    /* alloc space for ec codewords*/
+    seg.ec_blocks   = (int **) calloc(seg.G1 + seg.G2, sizeof(int *));
+    for (int i = 0; i < seg.G1 + seg.G1; i++) {
+        seg.ec_blocks[i] = (int *) calloc(ec_no, sizeof(int));
+    }
+
+    /* free memory */
+    fclose(ain); fclose(bin); fclose(cin); fclose(din);
+
+    return seg;
+}
 
 int fill_data(char **matrix) {
     FILE *in  = fopen(mode_path, "r");
     FILE *fin = fopen("utils/data_codewords_capacity.txt", "r");
     FILE *cin = fopen("utils/ec_codewords_capacity.txt","r");
-
-	unsigned codewords = load_capacity_data(fin);
+    
     unsigned capacity = load_capacity_data(in);
+	unsigned codewords = load_capacity_data(fin);
     unsigned ECcodewords = load_capacity_data(cin);
 
-    fclose(in);
-    fclose(fin);
-    fclose(cin);
-
     _bit_coord_ bit = {.x = size - 1, .y = size-1, .type = 1, .prev = 0}; 
+    _groups_ segments = alloc_groups(ECcodewords);
+
+    fclose(in); fclose(fin); fclose(cin);
 
     char *msg_in = (char *)calloc(MAXLEN, sizeof(char));
     fgets(msg_in, MAXLEN, stdin);
@@ -188,29 +243,31 @@ int fill_data(char **matrix) {
     if (strlen(msg_in)-1 <= capacity) {
         
         uchar * data_string = data_codewords(msg_in, codewords);
+        int * int_data_string = convert_to_INT(data_string, codewords);
+        // separate_blocks(int_data_string, &segments);
+        
+        free(msg_in);
+        free(data_string);
+        free(int_data_string);
+
+
         // printf("%d: ", codewords);
         // for (int i = 0; i < codewords; i++) {
         //     printf("%d,", data_string[i]);
         // } printf("\n");
 
-        for (int i = 0; i < codewords; i++) {
-            load_group(matrix, &bit, data_string[i]);
-        }
+        // for (int i = 0; i < codewords; i++) {
+        //     load_group(matrix, &bit, segments.group1_blocks[0][i]);
+        // }
+        // invert_int_array(int_data_string, codewords-1);
     
-        int * int_data_string = convert_to_INT(data_string, codewords);
-        invert_int_array(int_data_string, codewords-1);
         
-		polynomial M = poly_init(codewords - 1, int_data_string);         // message polynomial
-        polynomial encoded = reed_solomon(M, ECcodewords);
-        // polyprint(encoded);
-        for (int i = ECcodewords-1; i >= 0; i--) {                        // EC polynomial
-            load_group(matrix, &bit, encoded.coef[i]);
-        }
-
-        // free memory
-        free(int_data_string);
-        free(msg_in);
-        free(data_string);
+		// polynomial M = poly_init(codewords - 1, int_data_string);         // message polynomial
+        // polynomial encoded = reed_solomon(M, ECcodewords);
+        // // polyprint(encoded);
+        // for (int i = ECcodewords-1; i >= 0; i--) {                        // EC polynomial
+        //     load_group(matrix, &bit, encoded.coef[i]);
+        // }
 
         return 1;
 

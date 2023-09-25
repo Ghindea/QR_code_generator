@@ -118,3 +118,24 @@ int _is_set(char oct, int bit) {
         else return 0;
 }
 
+void free_polynomial(polynomial* poly)
+{
+    if(poly->is_heap_alloc)
+        free(poly->coef);
+}
+void free_tables(tables* table)
+{
+    free(table->_log);
+    free(table->_exp);
+}
+void free_groups(_groups_* seg) {
+    for (int i = 0; i < seg->G1+seg->G2; i++) {
+        free(seg->data_blocks[i]);
+    }
+    for (int i = 0; i < seg->G1+seg->G2; i++) {
+        free(seg->ec_blocks[i]);
+    }
+    free(seg->data_blocks);
+    free(seg->ec_blocks);
+    free(seg);
+}

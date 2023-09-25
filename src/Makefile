@@ -5,7 +5,7 @@ build:
 
 run: build
 	@./project
-	
+
 valgrind: 
 	valgrind --leak-check=yes --track-origins=yes ./project
 

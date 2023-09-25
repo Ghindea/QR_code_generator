@@ -166,59 +166,69 @@ int* convert_to_INT(const uchar* v, unsigned v_size)
 	}
 	return w;
 }
-// void alloc_groups(_groups_ *segments) {
-//     segments->group1_blocks = (int **) calloc(segments->G1, sizeof(int *));
-//     for (int i = 0; i < segments->G1; i++) {
-//         segments->group1_blocks[i] = (int *) calloc(segments->B1, sizeof(int));
-//     }
-//    
-//     if (segments->G2) {
-//         segments->group2_blocks = (int **) calloc(segments->G2, sizeof(int *));
-//         for (int i = 0; i < segments->G1; i++) {
-//             segments->group2_blocks[i] = (int *) calloc(segments->B2, sizeof(int));
-//         }
-//     }
-// }
-// void separate_blocks(int *data_string, _groups_ *segments) {
-//     int cont = 0;
-//     for (int i = 0; i < segments->G1; i++) {
-//         for (int j = 0; j < segments->B1; j++) {
-//             segments->group1_blocks[i][j] = data_string[cont++];
-//         }
-//     }
-//     for (int i = 0; i < segments->G2; i++) {
-//         for (int j = 0; j < segments->B2; j++) {
-//             segments->group2_blocks[i][j] = data_string[cont++];
-//         }
-//     }
-// }
-_groups_ alloc_groups(int ec_no) {
-    _groups_ seg;
+
+void encode_blocks(_groups_ *seg) {
+    polynomial decoded, encoded;
+    int cont = 0;
+    for (int i = 0; i < seg->G1; i++) {
+        decoded = poly_init(seg->B1-1, seg->data_blocks[cont]);
+        encoded = reed_solomon(decoded, seg->EC);
+        for (int j = 0; j < seg->EC; j++) {
+            seg->ec_blocks[cont][j] = encoded.coef[j];
+        }
+        cont++;
+    }
+    for (int i = 0; i < seg->G2; i++) {
+        decoded = poly_init(seg->B2-1, seg->data_blocks[cont++]);
+        encoded = reed_solomon(decoded, seg->EC);
+        for (int j = 0; j < seg->EC; j++) {
+            seg->ec_blocks[cont][j] = encoded.coef[j];
+        }
+        cont++;
+    }
+}
+void separate_blocks(int *data_string, _groups_ *seg) {
+    int cont = 0;
+    for (int  i = 0; i < seg->G1; i++) {    // for each block from group 1
+        for (int j = 0; j < seg->B1; j++) { // for each of its codewords
+            seg->data_blocks[i][j] = data_string[cont++];
+        }
+    }
+    for (int  i = 0; i < seg->G2; i++) {    // for each block from group 1
+        for (int j = 0; j < seg->B2; j++) { // for each of its codewords
+            seg->data_blocks[i][j] = data_string[cont++];
+        }
+    }
+}
+_groups_ * alloc_groups(int ec_no) {
+    _groups_ *seg = malloc(sizeof(_groups_));
 
     FILE *ain = fopen("utils/groups/blocks_no_G1.txt","r");
     FILE *bin = fopen("utils/groups/codewords_no_in_G1_blocks.txt","r");
-    FILE *cin = fopen("utils/groups/blocks_no_G2.txt","r");
+    FILE *ein = fopen("utils/groups/blocks_no_G2.txt","r");
     FILE *din = fopen("utils/groups/codewords_no_in_G2_blocks.txt","r");
 
-    seg.G1 = load_capacity_data(ain);   // number of blocks in G1
-    seg.B1 = load_capacity_data(bin);   // number of codewords for each of G1's block
-    seg.G2 = load_capacity_data(cin);   // number of blocks in G2
-    seg.B2 = load_capacity_data(din);   // number of codewords for each of G2's block
-
+    seg->EC = ec_no;
+    seg->G1 = load_capacity_data(ain);   // number of blocks in G1
+    seg->B1 = load_capacity_data(bin);   // number of codewords for each of G1's block
+    seg->G2 = load_capacity_data(ein);   // number of blocks in G2
+    seg->B2 = load_capacity_data(din);   // number of codewords for each of G2's block
+    
     /* alloc space for data codewords*/
-    seg.data_blocks = (int **) calloc(seg.G1 + seg.G2, sizeof(int *));
-    for (int i = 0; i < seg.G1 + seg.G2; i++) {
-        seg.data_blocks[i] = (int *) calloc(seg.B1 > seg.B2 ? seg.B1:seg.B2, sizeof(int));
+    int max = seg->B1 > seg->B2 ? seg->B1:seg->B2;
+    seg->data_blocks = (int **) calloc(seg->G1 + seg->G2, sizeof(int *));
+    for (int i = 0; i < seg->G1 + seg->G2; i++) {
+        seg->data_blocks[i] = (int *) calloc(max, sizeof(int));
     }
 
     /* alloc space for ec codewords*/
-    seg.ec_blocks   = (int **) calloc(seg.G1 + seg.G2, sizeof(int *));
-    for (int i = 0; i < seg.G1 + seg.G1; i++) {
-        seg.ec_blocks[i] = (int *) calloc(ec_no, sizeof(int));
+    seg->ec_blocks   = (int **) calloc(seg->G1 + seg->G2, sizeof(int *));
+    for (int i = 0; i < seg->G1 + seg->G2; i++) {
+        seg->ec_blocks[i] = (int *) calloc(ec_no, sizeof(int));
     }
 
     /* free memory */
-    fclose(ain); fclose(bin); fclose(cin); fclose(din);
+    fclose(ain); fclose(bin); fclose(ein); fclose(din);
 
     return seg;
 }
@@ -231,11 +241,11 @@ int fill_data(char **matrix) {
     unsigned capacity = load_capacity_data(in);
 	unsigned codewords = load_capacity_data(fin);
     unsigned ECcodewords = load_capacity_data(cin);
-
     _bit_coord_ bit = {.x = size - 1, .y = size-1, .type = 1, .prev = 0}; 
-    _groups_ segments = alloc_groups(ECcodewords);
+    _groups_ * segments = alloc_groups(ECcodewords);
 
     fclose(in); fclose(fin); fclose(cin);
+
 
     char *msg_in = (char *)calloc(MAXLEN, sizeof(char));
     fgets(msg_in, MAXLEN, stdin);
@@ -244,11 +254,17 @@ int fill_data(char **matrix) {
         
         uchar * data_string = data_codewords(msg_in, codewords);
         int * int_data_string = convert_to_INT(data_string, codewords);
-        // separate_blocks(int_data_string, &segments);
-        
+        // for (int i = 0; i < codewords; i++) {
+        //     printf("%d,", int_data_string[i]);
+        // } printf("\n");
+
+        separate_blocks(int_data_string, segments);
+        encode_blocks(segments);
+
         free(msg_in);
         free(data_string);
         free(int_data_string);
+        free_groups(segments);
 
 
         // printf("%d: ", codewords);
@@ -276,17 +292,5 @@ int fill_data(char **matrix) {
         error(0);
         return 0;
     }
-    
-}
-
-void free_polynomial(polynomial* poly)
-{
-    if(poly->is_heap_alloc)
-        free(poly->coef);
-}
-void free_tables(tables* table)
-{
-    free(table->_log);
-    free(table->_exp);
 }
 // dg

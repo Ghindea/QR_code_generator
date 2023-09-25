@@ -57,3 +57,7 @@ void error(int);            //
 void printMatrix(char **);  //
 void makeQR(char **);       // auxiliary functions (extra.c)
 void invert_int_array (int* arr, unsigned int end);
+
+void free_polynomial(polynomial*);
+void free_tables(tables*);
+void free_groups(_groups_*);

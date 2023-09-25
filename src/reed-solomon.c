@@ -177,8 +177,8 @@ polynomial reed_solomon(polynomial M, int nerc) {       // nerc = number of erro
     // polynomial msg_out = poly_sum(M, EC);            // encoded message
 
     // free memory
-    free_tables(&t);
     free(aux_coef);
+    free_tables(&t);
     free_polynomial(&G);
 
     return EC;

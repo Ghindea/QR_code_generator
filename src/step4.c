@@ -46,7 +46,24 @@ char * load_format(FILE *din, int mask) {
     }
     return string;
 }
+void apply_version_format(char **qr) {
+    FILE *input = fopen("utils/version_format_info.txt", "r");
+    char * string = (char*) calloc(18, sizeof(char));
 
+    for (int i = 7; i <= version; i++) {
+        fscanf(input, "%s", string);
+    }
+    int cont = 0;
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 6; j++) {
+            qr[size - 11 + i][j] = string[cont];
+            qr[j][size - 11 + i] = string[cont];
+            cont++;
+        }
+    }
+    free(string);
+    fclose(input);
+}
 void apply_format(char **qr, int mask) {
     FILE *din = fopen("utils/format_information_string.txt", "r");
     char *format_string = load_format(din, mask);
@@ -65,8 +82,9 @@ void apply_format(char **qr, int mask) {
     for (int i = 0; i <= 5; i++) {
         qr[i][8] = format_string[14-i] - '0';
     }
-
-    fclose(din);
+    if (version >= 7) apply_version_format(qr);
+    
     // free memory
+    fclose(din);
     free(format_string);
 }

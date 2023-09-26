@@ -39,8 +39,8 @@ void apply_base(char **matrix) {    // finder patterns; timing pattern; dark mod
     }
     for (int j = 7; j < size - 7; j++) {
         if (j % 2 == 0) {
-            matrix[6][j] = 1;
-            matrix[j][6] = 1;
+            matrix[6][j] = 3;
+            matrix[j][6] = 3;
         }
     }
     matrix[size-8][8] = 1;
@@ -57,8 +57,8 @@ void apply_alignment(char **matrix) {   // alignment patterns versions 2->13
         case 1: {                   // teoretic sunt 9 alignment patternuri, dar in practica ies 6
             int a = 22+(version%7)*2, b = 18+(version-2)*4; // caci 3 se suprapun
             int v[] = {6, a, b};
-            for (int i = 0; i <= 2; i++) {
-                for (int j = 0; j <= 2; j++) {
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
                     draw_alignment(v[i],v[j],matrix);
                 }
             }

@@ -64,6 +64,10 @@ int available(char **qr, char x, char y) {        // checks if module coordonate
     if (x > -1 && x < 9 && y >-1 && y < 9) return 2;        // find pttrn up left
     if (x > size-9 && x < size && y > -1 && y < 9) return 2;// find pttrn dwn left
     if (x > -1 && x < 9 && y > size-9 && y < size) return 2;// find pttrn up right
+    if (version >= 7) {
+        if (x > -1 && x < 6 && y > size - 12 && y < size - 8) return 2; // special format pttrn up right 
+        if (x > size - 12 && x < size - 8 && y > -1 && y < 6) return 2; // special format pttrn up right 
+    }
     if (qr[x][y]) return 0;                                 // format pttrn + alignment pttrn
     if (y == 6 || x == 6) return 0;                         // timing pttrn
 
@@ -177,21 +181,16 @@ void interleave(char **qr, _groups_ *seg) {
     for (int j = 0; j < min; j++) {
         for (int i = 0; i < seg->G1 + seg->G2; i++) {
             load_codeword(qr, &bit, seg->data_blocks[i][j]);
-            printf("%d ", seg->data_blocks[i][j]);
         }
     }
     for (int i = 0; i < seg->G2; i++) {
         load_codeword(qr, &bit, seg->data_blocks[seg->G1 + i][seg->B2 - 1]);
-        printf("%d ", seg->data_blocks[seg->G1 + i][seg->B2 - 1]);
     }
-    printf("\n================================\n");
     for (int j = 0; j < seg->EC; j++) {
         for (int i = 0; i < seg->G1+seg->G2; i++) {
             load_codeword(qr, &bit, seg->ec_blocks[i][j]);
-            printf("%d ", seg->ec_blocks[i][j]);
         }
     }
-    printf("\n");
 }
 void encode_blocks(_groups_ *seg) {
     polynomial decoded, encoded;

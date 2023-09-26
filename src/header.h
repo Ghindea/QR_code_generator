@@ -26,7 +26,6 @@ typedef struct {
 typedef struct poly{
     int grad;   // gradul polinomului
     int *coef;  // vector coeficienti
-    int is_heap_alloc;
 }polynomial;
 typedef struct {
     uchar *_exp, *_log;

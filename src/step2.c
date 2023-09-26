@@ -86,7 +86,6 @@ void position_down(int *prev, char *x, char *y) {
     (*prev)++;
 }
 void load_codeword(char **qr, _bit_coord_ *bit, int val) {
-    FILE *out = fopen("test.txt","w+");
     int i = 7, msk = 1;
     // prev % 2 == 0 -> left 
     // prev % 2 == 1 -> upper-right/down-right

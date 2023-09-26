@@ -48,7 +48,7 @@ char * load_format(FILE *din, int mask) {
 }
 void apply_version_format(char **qr) {
     FILE *input = fopen("utils/version_format_info.txt", "r");
-    char * string = (char*) calloc(18, sizeof(char));
+    char * string = (char*) calloc(20, sizeof(char));
     for (int i = 7; i <= version; i++) {
         fscanf(input, "%s", string);
     }

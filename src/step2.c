@@ -193,27 +193,32 @@ void interleave(char **qr, _groups_ *seg) {
     }
 }
 void encode_blocks(_groups_ *seg) {
-    polynomial decoded, encoded;
     int cont = 0; int *tmp = (int*)calloc(seg->B1 > seg->B2 ? seg->B1:seg->B2, sizeof(int));
     for (int i = 0; i < seg->G1; i++) {
         memcpy(tmp, seg->data_blocks[cont], (seg->B1) * sizeof(int));
         invert_int_array(tmp, seg->B1-1);
-        decoded = poly_init(seg->B1-1, tmp);
-        encoded = reed_solomon(decoded, seg->EC);
+        polynomial decoded = poly_init(seg->B1-1, tmp);
+        polynomial encoded = reed_solomon(decoded, seg->EC);
         for (int j = 0; j < seg->EC; j++) {
             seg->ec_blocks[cont][j] = encoded.coef[seg->EC - j - 1];
         }
         cont++;
+
+        free_polynomial(&encoded);
+        free_polynomial(&decoded);
     }
     for (int i = 0; i < seg->G2; i++) {
          memcpy(tmp, seg->data_blocks[cont], (seg->B2) * sizeof(int));
         invert_int_array(tmp, seg->B2-1);
-        decoded = poly_init(seg->B2-1, tmp);
-        encoded = reed_solomon(decoded, seg->EC);
+        polynomial decoded = poly_init(seg->B2-1, tmp);
+        polynomial encoded = reed_solomon(decoded, seg->EC);
         for (int j = 0; j < seg->EC; j++) {
             seg->ec_blocks[cont][j] = encoded.coef[seg->EC - j - 1];
         }
         cont++;
+
+        free_polynomial(&encoded);
+        free_polynomial(&decoded);
     }
 
     free(tmp);

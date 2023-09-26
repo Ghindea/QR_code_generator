@@ -33,16 +33,11 @@ typedef struct {
 }tables;
 tables load_gf256();
 
-void polyprint(polynomial);
-polynomial poly_init(int, int *);
+polynomial poly_init(int, const int *);
 polynomial reed_solomon(polynomial, int);
 
 void polyprint(polynomial);
 void normalise(polynomial *);
-
-/* custom free functions */
-void free_polynomial(polynomial* poly);
-void free_tables(tables* table);
 
 /* multi file functions*/
 char **initMatrix();                   // step 1
@@ -58,6 +53,7 @@ void printMatrix(char **);  //
 void makeQR(char **);       // auxiliary functions (extra.c)
 void invert_int_array (int* arr, unsigned int end);
 
+/* custom free functions */
 void free_polynomial(polynomial*);
 void free_tables(tables*);
 void free_groups(_groups_*);

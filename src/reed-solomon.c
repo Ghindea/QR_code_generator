@@ -67,16 +67,15 @@ tables load_gf256() {
 }
 
 /* polynomial stuff */
-/* This function passes ownership of the allocated polynomial if val == NULL */
-polynomial poly_init(int n, int * val) {
+
+/* This function passes ownership of the returned polynomial.
+ * If val is not NULL, it copies the contents of val into the polynomial. */
+polynomial poly_init(int n, const int * val) {
     polynomial P;
     P.grad = n;
-    if (!val) {
-        P.coef = (int *)calloc(n+1, sizeof(int));
-        P.is_heap_alloc = 1;
-    } else {
-        P.coef = val;
-        P.is_heap_alloc = 0;
+    P.coef = (int *)calloc(n+1, sizeof(int));
+    if (val) {
+        memcpy(P.coef, val, (n+1) * sizeof(int));
     }
 
     return P;
@@ -95,7 +94,7 @@ polynomial poly_sum(polynomial A, polynomial B) {
     return sum;
 }
 
-/* This function passes ownership of the allocated polynomial */
+/* This function passes ownership of the returned polynomial */
 polynomial poly_multiplication(polynomial P1, polynomial P2, tables t) {
     polynomial P3 = poly_init(P1.grad + P2.grad, NULL);
         for (int i = 0; i <= P1.grad; i++) {
@@ -127,7 +126,6 @@ polynomial poly_division(polynomial P1, polynomial P2, tables t) {
         }
     }
     int sep = msg_out.grad-P2.grad;
-    //polynomial remainder = poly_init(sep, msg_out.coef+sep+1);
     polynomial remainder = poly_init(P2.grad - 1, msg_out.coef+sep+1);
     invert_int_array(remainder.coef, remainder.grad);
 
@@ -148,14 +146,6 @@ polynomial generator(int n) {
         free_polynomial(&P);
         P = P_aux;
     }
-    // polynomial P = poly_init(n,NULL);
-    // for (int i = 0; i <= n; i++) {
-    //     int termen = 1;
-    //     for (int j = 0; j < i; j++) {
-    //         termen = (termen * 2) % 256;         // ChatGPT was given a chance. it failed...
-    //     }
-    //     P.coef[i] = termen;
-    // }
 
     // free memory
     free_tables(&table);
@@ -164,21 +154,24 @@ polynomial generator(int n) {
     return P;
 }
 
+/* This function passes ownership of the returned polynomial */
 polynomial reed_solomon(polynomial M, int nerc) {       // nerc = number of error correction codewords
     tables t = load_gf256();                            // exponential and logarithmic values in GF(256)
     polynomial G = generator(nerc);                     // generator polynomial
 
-    int *aux_coef = (int *)calloc(nerc+1, sizeof(int));
-    aux_coef[nerc] = 1;                                 // To make sure that the exponent of the lead term
-    polynomial aux = poly_init(nerc, aux_coef);         // doesn't become too small during the division, multiply
-    M = poly_multiplication(M, aux, t);                 // the message polynomial by x^n
+    // To make sure that the exponent of the lead term doesn't become too small during the division, multiply
+    // the message polynomial by x^n
+    polynomial aux = poly_init(nerc, NULL);
+    aux.coef[nerc] = 1;
+    polynomial M2 = poly_multiplication(M, aux, t);
 
-    polynomial EC = poly_division(M, G, t);             // error correction polynomial
+    polynomial EC = poly_division(M2, G, t);             // error correction polynomial
     // polynomial msg_out = poly_sum(M, EC);            // encoded message
 
     // free memory
-    free(aux_coef);
     free_tables(&t);
+    free_polynomial(&aux);
+    free_polynomial(&M2);
     free_polynomial(&G);
 
     return EC;

@@ -78,10 +78,11 @@ The process of generating a QR code consists of 5 steps:
 - *Alignment Patterns* are used to straighten out QR Codes drawn on a curved surface. Depending of the selected QR version more or less alignment patterns can be placed.
 - *Dark Module* is a single module that is always set on 1
 
-<img style="display: block; width: 25%;"
+<img style="display: block; width: 40%;"
     src="./git_aux/patterns.png" 
     alt="patterns placement">
 </img>
+
 QR code version 2
 </details>
 <details><summary> Step 2: encode data & place modules in matrix </summary>
@@ -110,6 +111,7 @@ To ensure that the data is read correctly by the scanner it's required to genera
     src="./git_aux/codewords.png" 
     alt="encoding results">
 </img>
+
 Codewords obtained for "Hello world!" input in a version 1 QR code.
 
 ---

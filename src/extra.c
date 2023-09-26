@@ -1,3 +1,6 @@
+#ifdef QRCODE_MAKE_PNG
+#include "dep/stb_image_write.h"
+#endif
 #include "header.h"
 
 void bitprint(int n) {
@@ -83,7 +86,7 @@ void makeQR(char **matrix) {
         }
     }
 
-    // top padding
+    // bottom padding
     for (int i = 1; i <= scale; i++) {
         for (int j = 1; j <= img_line_len; j++) {
             fwrite(&alb, sizeof(uchar), 1, out);
@@ -94,6 +97,73 @@ void makeQR(char **matrix) {
 
     fclose(out);
 }
+
+#ifdef QRCODE_MAKE_PNG
+void makeQR_PNG(char **matrix) {
+
+    const int img_line_len = scale * (size + 2);
+    uchar alb = 255, r = red, g = green, b = blue;
+
+    uchar* pixel_data = calloc(img_line_len * img_line_len * 3, sizeof(uchar));
+    unsigned int pos = 0;
+
+    // top padding
+    for (int i = 1; i <= scale; i++) {
+        for (int j = 1; j <= img_line_len; j++) {
+            pixel_data[pos++] = alb;
+            pixel_data[pos++] = alb;
+            pixel_data[pos++] = alb;
+        }
+    }
+
+    // qr code data
+    for (int i = 0; i < size; i++) {
+        for (int k = 1; k <= scale; k++) {
+
+            // left padding
+            for (int m = 1; m <= scale; m++) {
+                pixel_data[pos++] = alb;
+                pixel_data[pos++] = alb;
+                pixel_data[pos++] = alb;
+            }
+
+            // QR pixel data
+            for (int j = 0 ; j < size; j++) {
+                for (int l = 1; l <= scale; l++) {
+                    if (matrix[i][j] % 2) {
+                        pixel_data[pos++] = r;
+                        pixel_data[pos++] = g;
+                        pixel_data[pos++] = b;
+                    } else {
+                        pixel_data[pos++] = alb;
+                        pixel_data[pos++] = alb;
+                        pixel_data[pos++] = alb;
+                    }
+                }
+            }
+
+            // right padding
+            for (int m = 1; m <= scale; m++) {
+                pixel_data[pos++] = alb;
+                pixel_data[pos++] = alb;
+                pixel_data[pos++] = alb;
+            }
+        }
+    }
+
+    // bottom padding
+    for (int i = 1; i <= scale; i++) {
+        for (int j = 1; j <= img_line_len; j++) {
+            pixel_data[pos++] = alb;
+            pixel_data[pos++] = alb;
+            pixel_data[pos++] = alb;
+        }
+    }
+
+    stbi_write_png("QR.png", img_line_len, img_line_len, 3,  pixel_data, img_line_len * 3 * sizeof(uchar));
+    free(pixel_data);
+}
+#endif
 
 void invert_int_array (int * arr, unsigned int end) {
     int tmp;
@@ -120,8 +190,7 @@ int _is_set(char oct, int bit) {
 
 void free_polynomial(polynomial* poly)
 {
-    if(poly->is_heap_alloc)
-        free(poly->coef);
+    free(poly->coef);
 }
 void free_tables(tables* table)
 {

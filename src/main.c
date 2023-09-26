@@ -8,8 +8,13 @@ int main(int argc, char **argv)
         int ok = fill_data(qr);
         if (ok) {
             mask_matrix(qr);
+#ifdef QRCODE_MAKE_PNG
+            makeQR_PNG(qr);
+            system("xdg-open QR.png");
+#else
             makeQR(qr);
             system("xdg-open QR.ppm");  // TODO: find cross-compatible alternative (if possible)
+#endif
         }
 
         free_matrix(qr);

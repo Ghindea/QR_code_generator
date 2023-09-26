@@ -49,7 +49,10 @@ int _is_set(char, int);
 void bitprint(int);         //
 void error(int);            //
 void printMatrix(char **);  //
-void makeQR(char **);       // auxiliary functions (extra.c)
+void makeQR(char **);       //
+#ifdef QRCODE_MAKE_PNG
+void makeQR_PNG(char **);
+#endif
 void invert_int_array (int* arr, unsigned int end);
 
 /* custom free functions */

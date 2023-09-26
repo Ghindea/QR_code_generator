@@ -9,7 +9,7 @@
 // step 4: apply format patterns
 
 // QR properties
-#define version 9
+#define version 1
 #define error_correction_level 1
 #define data_type 3
 #define mask_type 5

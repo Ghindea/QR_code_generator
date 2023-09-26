@@ -9,7 +9,7 @@ int main(int argc, char **argv)
         if (ok) {
             mask_matrix(qr);
             makeQR(qr);
-            system("xdg-open QR.ppm");  // TODO: find cross-compatible alternative (if possible)
+            // system("xdg-open QR.ppm");  // TODO: find cross-compatible alternative (if possible)
         }
 
         free_matrix(qr);

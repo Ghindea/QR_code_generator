@@ -296,7 +296,7 @@ int fill_data(char **matrix) {
 
     fclose(in); fclose(fin); fclose(cin);
 
-
+    printf("\n\n");
     char *msg_in = (char *)calloc(MAXLEN, sizeof(char));
     fgets(msg_in, MAXLEN, stdin);
 
@@ -307,23 +307,23 @@ int fill_data(char **matrix) {
 
         separate_blocks(int_data_string, segments);
         encode_blocks(segments);
-        // printf("\n=====================================================\nRESULTS\n");
-        // for (int i = 0; i < segments->G1 + segments->G2; i++) {
-        //     printf("block %d - %d codewords:    ", i, segments->B2);
-        //     for (int j = 0; j < segments->B1; j++) {
-        //         printf("%d,", segments->data_blocks[i][j]);
-        //     }printf("\n");
-        // }
-        // printf("\n=====================================================\n");
-        // for (int i = 0; i < segments->G1 + segments->G2; i++) {
-        //     printf("block %d - %d ec_codewords: ", i, segments->EC);
-        //     for (int j = 0; j < segments->EC; j++) {
-        //         printf("%d,", segments->ec_blocks[i][j]);
-        //     }
-        //     printf("\n");
-        // }
-        // printf("\n=====================================================\n");
-        // printf("total codewords: %d\n", segments->G1 * segments->B1 + segments->G2 * segments->B2);
+        printf("\n\nRESULTS\n=====================================================\n");
+        for (int i = 0; i < segments->G1 + segments->G2; i++) {
+            printf("%d codewords:    ", segments->B1);
+            for (int j = 0; j < segments->B1; j++) {
+                printf("%d,", segments->data_blocks[i][j]);
+            }printf("\n");
+        }
+        printf("\n=====================================================\n");
+        for (int i = 0; i < segments->G1 + segments->G2; i++) {
+            printf("%d ec_codewords: ",segments->EC);
+            for (int j = 0; j < segments->EC; j++) {
+                printf("%d,", segments->ec_blocks[i][j]);
+            }
+            printf("\n");
+        }
+        printf("\n=====================================================\n");
+        printf("total codewords: %d\n\n\n", segments->G1 * segments->B1 + segments->G2 * segments->B2 + segments->EC);
         interleave(matrix, segments);
 
         free(msg_in);

@@ -120,8 +120,7 @@ int _is_set(char oct, int bit) {
 
 void free_polynomial(polynomial* poly)
 {
-    if(poly->is_heap_alloc)
-        free(poly->coef);
+    free(poly->coef);
 }
 void free_tables(tables* table)
 {

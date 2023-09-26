@@ -81,7 +81,7 @@ void position_down(int *prev, char *x, char *y) {
     } else (*y)--;
     (*prev)++;
 }
-void load_group(char **qr, _bit_coord_ *bit, int val) {
+void load_codeword(char **qr, _bit_coord_ *bit, int val) {
     int i = 7, msk = 1;
     // prev % 2 == 0 -> left 
     // prev % 2 == 1 -> upper-right/down-right
@@ -158,8 +158,7 @@ uchar * data_codewords(char *msg_in, unsigned codewords) {
 }
 
 /* This function passes ownership of the allocated array */
-int* convert_to_INT(const uchar* v, unsigned v_size)
-{
+int* convert_to_INT(const uchar* v, unsigned v_size) {
 	int * w = (int *) calloc(v_size,sizeof(int));
 	for (int i = 0; i < v_size; i++) {
 		w[i] = (int) v[i];
@@ -167,37 +166,72 @@ int* convert_to_INT(const uchar* v, unsigned v_size)
 	return w;
 }
 
+void interleave(char **qr, _groups_ *seg) {
+    _bit_coord_ bit = {.x = size - 1, .y = size-1, .type = 1, .prev = 0}; 
+    int min; 
+
+    if (!seg->B2) {
+        min = seg->B1;
+    } else {min = seg->B1 < seg->B2 ? seg->B1:seg->B2;}
+
+    for (int j = 0; j < min; j++) {
+        for (int i = 0; i < seg->G1 + seg->G2; i++) {
+            load_codeword(qr, &bit, seg->data_blocks[i][j]);
+            printf("%d ", seg->data_blocks[i][j]);
+        }
+    }
+    for (int i = 0; i < seg->G2; i++) {
+        load_codeword(qr, &bit, seg->data_blocks[seg->G1 + i][seg->B2 - 1]);
+        printf("%d ", seg->data_blocks[seg->G1 + i][seg->B2 - 1]);
+    }
+    printf("\n================================\n");
+    for (int j = 0; j < seg->EC; j++) {
+        for (int i = 0; i < seg->G1+seg->G2; i++) {
+            load_codeword(qr, &bit, seg->ec_blocks[i][j]);
+            printf("%d ", seg->ec_blocks[i][j]);
+        }
+    }
+    printf("\n");
+}
 void encode_blocks(_groups_ *seg) {
     polynomial decoded, encoded;
-    int cont = 0;
+    int cont = 0; int *tmp = (int*)calloc(seg->B1 > seg->B2 ? seg->B1:seg->B2, sizeof(int));
     for (int i = 0; i < seg->G1; i++) {
-        decoded = poly_init(seg->B1-1, seg->data_blocks[cont]);
+        memcpy(tmp, seg->data_blocks[cont], (seg->B1) * sizeof(int));
+        invert_int_array(tmp, seg->B1-1);
+        decoded = poly_init(seg->B1-1, tmp);
         encoded = reed_solomon(decoded, seg->EC);
         for (int j = 0; j < seg->EC; j++) {
-            seg->ec_blocks[cont][j] = encoded.coef[j];
+            seg->ec_blocks[cont][j] = encoded.coef[seg->EC - j - 1];
         }
         cont++;
     }
     for (int i = 0; i < seg->G2; i++) {
-        decoded = poly_init(seg->B2-1, seg->data_blocks[cont++]);
+         memcpy(tmp, seg->data_blocks[cont], (seg->B2) * sizeof(int));
+        invert_int_array(tmp, seg->B2-1);
+        decoded = poly_init(seg->B2-1, tmp);
         encoded = reed_solomon(decoded, seg->EC);
         for (int j = 0; j < seg->EC; j++) {
-            seg->ec_blocks[cont][j] = encoded.coef[j];
+            seg->ec_blocks[cont][j] = encoded.coef[seg->EC - j - 1];
         }
         cont++;
     }
+
+    free(tmp);
 }
 void separate_blocks(int *data_string, _groups_ *seg) {
-    int cont = 0;
+    int cont = 0, block = 0;
     for (int  i = 0; i < seg->G1; i++) {    // for each block from group 1
         for (int j = 0; j < seg->B1; j++) { // for each of its codewords
-            seg->data_blocks[i][j] = data_string[cont++];
+            seg->data_blocks[block][j] = data_string[cont++];
         }
+        block++;
     }
     for (int  i = 0; i < seg->G2; i++) {    // for each block from group 1
         for (int j = 0; j < seg->B2; j++) { // for each of its codewords
-            seg->data_blocks[i][j] = data_string[cont++];
+            seg->data_blocks[block][j] = data_string[cont++];
         }
+        block++;
     }
 }
 _groups_ * alloc_groups(int ec_no) {
@@ -241,7 +275,6 @@ int fill_data(char **matrix) {
     unsigned capacity = load_capacity_data(in);
 	unsigned codewords = load_capacity_data(fin);
     unsigned ECcodewords = load_capacity_data(cin);
-    _bit_coord_ bit = {.x = size - 1, .y = size-1, .type = 1, .prev = 0}; 
     _groups_ * segments = alloc_groups(ECcodewords);
 
     fclose(in); fclose(fin); fclose(cin);
@@ -254,12 +287,25 @@ int fill_data(char **matrix) {
         
         uchar * data_string = data_codewords(msg_in, codewords);
         int * int_data_string = convert_to_INT(data_string, codewords);
-        // for (int i = 0; i < codewords; i++) {
-        //     printf("%d,", int_data_string[i]);
-        // } printf("\n");
 
         separate_blocks(int_data_string, segments);
         encode_blocks(segments);
+        // printf("\n=====================================================\nRESULTS\n");
+        // for (int i = 0; i < segments->G1 + segments->G2; i++) {
+        //     printf("block %d - %d codewords:    ", i, segments->B2);
+        //     for (int j = 0; j < segments->B2; j++) {
+        //         printf("%d,", segments->data_blocks[i][j]);
+        //     }printf("\n");
+        // }
+        // printf("\n=====================================================\n");
+        // for (int i = 0; i < segments->G1 + segments->G2; i++) {
+        //     printf("block %d - %d ec_codewords: ", i, segments->EC);
+        //     for (int j = 0; j < segments->EC; j++) {
+        //         printf("%d,", segments->ec_blocks[i][j]);
+        //     }printf("\n");
+        // }
+        // printf("total codewords: %d\n", segments->G1 * segments->B1 + segments->G2 * segments->B2);
+        interleave(matrix, segments);
 
         free(msg_in);
         free(data_string);
@@ -273,7 +319,7 @@ int fill_data(char **matrix) {
         // } printf("\n");
 
         // for (int i = 0; i < codewords; i++) {
-        //     load_group(matrix, &bit, segments.group1_blocks[0][i]);
+        //     load_codeword(matrix, &bit, segments.group1_blocks[0][i]);
         // }
         // invert_int_array(int_data_string, codewords-1);
     
@@ -282,7 +328,7 @@ int fill_data(char **matrix) {
         // polynomial encoded = reed_solomon(M, ECcodewords);
         // // polyprint(encoded);
         // for (int i = ECcodewords-1; i >= 0; i--) {                        // EC polynomial
-        //     load_group(matrix, &bit, encoded.coef[i]);
+        //     load_codeword(matrix, &bit, encoded.coef[i]);
         // }
 
         return 1;

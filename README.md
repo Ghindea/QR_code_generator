@@ -30,7 +30,7 @@ Useful links [^2]
         ...
         40: 177x177; can encode up to 2953 ASCII characters
 ```                
-Currently only the first 6 versions are implemented. For more information about character capacities see [^1]
+Currently only the first 9 versions are implemented. For more information about character capacities see [^1]
       
 2. `mask`: certain patterns in the QR code matrix can make it difficult for QR code scanners to correctly read the code. to counteract this, the QR code specification defines 8 mask patterns:
 ```

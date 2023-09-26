@@ -139,3 +139,4 @@ void free_groups(_groups_* seg) {
     free(seg->ec_blocks);
     free(seg);
 }
+//dg

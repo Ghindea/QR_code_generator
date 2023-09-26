@@ -86,28 +86,42 @@ void position_down(int *prev, char *x, char *y) {
     (*prev)++;
 }
 void load_codeword(char **qr, _bit_coord_ *bit, int val) {
+    FILE *out = fopen("test.txt","w+");
     int i = 7, msk = 1;
     // prev % 2 == 0 -> left 
     // prev % 2 == 1 -> upper-right/down-right
     while (i >= 0) {
-        if (bit->type == 1 && available(qr, bit->x, bit->y) == 2) {
-            (bit->x)++; bit->y -= 2; bit->type = 2;
+        if (bit->x < 6 && bit->y == size - 12 && version >= 7) {
+            while (i >= 0 || bit->x < 6) {
+                msk = 1 << i;
+                if (msk & val) qr[bit->x][bit->y] = 1;
+                i--; bit->x++;
+            }
+            if (bit->x == 6) {
+                bit->x = 7; bit->y++; bit->type = 2; bit->prev = 0;
+            }
+        } else {
+            if (bit->type == 1 && available(qr, bit->x, bit->y) == 2) {
+                (bit->x)++; bit->y -= 2; bit->type = 2;
+            }
+            if (bit->type == 2 && available(qr, bit->x, bit->y) == 2) {
+                bit->x--; bit->y -= 2; bit->type = 1;
+            }
+            if (available(qr, bit->x, bit->y) == 1){
+                msk = 1 << i;
+                if (msk & val) qr[bit->x][bit->y] = 1;
+                i--;
+            } 
+            if (bit->x == size - 1 && bit->y == 9) {
+                bit->x = size - 9; bit->y--; bit->type = 1; 
+                bit->prev = 0;
+            } else  if (bit->x == 9 && bit->y == 7) {
+                bit->y -= 2; bit->type = 2; bit->prev = 0;
+            } else  if (bit->x == 7 && bit->y == size - 10 && version >= 7) {
+                bit->x = 0; bit->y -= 2; bit->type = 2;
+            } else  if (bit->type == 1) position_up(&bit->prev, &bit->x, &bit->y);  // type == 1 -> up
+                else position_down(&bit->prev, &bit->x, &bit->y);                   // type == 2 -> down      
         }
-        if (bit->type == 2 && available(qr, bit->x, bit->y) == 2) {
-            bit->x--; bit->y -= 2; bit->type = 1;
-        }
-        if (available(qr, bit->x, bit->y) == 1){
-            msk = 1 << i;
-            if (msk & val) qr[bit->x][bit->y] = 1;
-            i--;
-        } 
-        if (bit->x == size - 1 && bit->y == 9) {
-            bit->x = size - 9; bit->y--; bit->type = 1; 
-            bit->prev = 0;
-        } else  if (bit->x == 9 && bit->y == 7) {
-            bit->y -= 2; bit->type = 2; bit->prev = 0;
-        } else  if (bit->type == 1) position_up(&bit->prev, &bit->x, &bit->y);  // type == 1 -> up
-            else position_down(&bit->prev, &bit->x, &bit->y);                   // type == 2 -> down
     }
 
 }
@@ -292,7 +306,7 @@ int fill_data(char **matrix) {
         // printf("\n=====================================================\nRESULTS\n");
         // for (int i = 0; i < segments->G1 + segments->G2; i++) {
         //     printf("block %d - %d codewords:    ", i, segments->B2);
-        //     for (int j = 0; j < segments->B2; j++) {
+        //     for (int j = 0; j < segments->B1; j++) {
         //         printf("%d,", segments->data_blocks[i][j]);
         //     }printf("\n");
         // }
@@ -301,8 +315,10 @@ int fill_data(char **matrix) {
         //     printf("block %d - %d ec_codewords: ", i, segments->EC);
         //     for (int j = 0; j < segments->EC; j++) {
         //         printf("%d,", segments->ec_blocks[i][j]);
-        //     }printf("\n");
+        //     }
+        //     printf("\n");
         // }
+        // printf("\n=====================================================\n");
         // printf("total codewords: %d\n", segments->G1 * segments->B1 + segments->G2 * segments->B2);
         interleave(matrix, segments);
 
@@ -310,25 +326,6 @@ int fill_data(char **matrix) {
         free(data_string);
         free(int_data_string);
         free_groups(segments);
-
-
-        // printf("%d: ", codewords);
-        // for (int i = 0; i < codewords; i++) {
-        //     printf("%d,", data_string[i]);
-        // } printf("\n");
-
-        // for (int i = 0; i < codewords; i++) {
-        //     load_codeword(matrix, &bit, segments.group1_blocks[0][i]);
-        // }
-        // invert_int_array(int_data_string, codewords-1);
-    
-        
-		// polynomial M = poly_init(codewords - 1, int_data_string);         // message polynomial
-        // polynomial encoded = reed_solomon(M, ECcodewords);
-        // // polyprint(encoded);
-        // for (int i = ECcodewords-1; i >= 0; i--) {                        // EC polynomial
-        //     load_codeword(matrix, &bit, encoded.coef[i]);
-        // }
 
         return 1;
 

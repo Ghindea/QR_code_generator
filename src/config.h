@@ -9,10 +9,10 @@
 // step 4: apply format patterns
 
 // QR properties
-#define version 1
-#define error_correction_level 2
+#define version 20
+#define error_correction_level 1
 #define data_type 3
-#define mask_type 5
+#define mask_type 1
 // color parameters
 #define red 0
 #define green 0

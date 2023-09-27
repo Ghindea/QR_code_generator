@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -g -std=c11 -fsanitize=address #-Wall
+CFLAGS = -g -std=c11 #-fsanitize=address -Wall
 build:
 	@$(CC) *.c $(CFLAGS) -o project
 

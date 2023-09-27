@@ -113,9 +113,22 @@ uchar * invert_uchar_array (uchar * a, int arr_size) {
     return b;
 }
 
-int _is_set(char oct, int bit) {
-    if (oct & (1 << bit)) return 1;
-        else return 0;
+int _is_set(void *num, int bit, char type) {
+
+    switch (type)
+    {
+    case 0:     // char
+        if (*(char*)num & (1 << bit)) return 1; // bit is set
+            else return 0;                      // bit isn't set
+        break;
+    case 1:     // int
+        if (*(int*)num & (1 << bit)) return 1;
+            else return 0;
+        break;
+    default:
+        break;
+    }
+    
 }
 
 void free_polynomial(polynomial* poly)

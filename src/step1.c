@@ -1,4 +1,10 @@
 #include "header.h"
+const int unu[]   = {0,0,18,22,26,30,34,22,24,26,28,30,32,34,26,26,26,30,30,30,34,28,26,30,28,32,30,34,26,30,26,30,34,30,34,30,24,28,32,26,30};
+const int doi[]   = {0,0,0,0,0,0,0,38,42,46,50,54,58,62,46,48,50,54,56,58,62,50,50,54,54,58,58,62,50,54,52,56,60,58,62,54,50,54,58,54,58};
+const int trei[]  = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,66,70,74,78,82,86,90,72,74,78,80,84,86,90,74,78,78,82,86,86,90,78,76,80,84,82,86};
+const int patru[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,94,98,102,106,110,114,118,98,102,104,108,112,114,118,102,102,106,110,110,114};
+const int cinci[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,122,126,130,134,138,142,146,126,128,132,136,138,142};
+const int sase[]  = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,150,154,158,162,166,170}; 
 
 void draw_alignment(int x, int y, char **matrix) {
     if (matrix[x][y] == 1) return;
@@ -46,26 +52,13 @@ void apply_base(char **matrix) {    // finder patterns; timing pattern; dark mod
     matrix[size-8][8] = 1;
 }
 void apply_alignment(char **matrix) {   // alignment patterns versions 2->13
-    switch (version/7)
-    {
-        case 0: {                   // pentru versiunile 1-6 nu poate fi decat un alignment pattern
-            if (version == 1) break;// la cordonata (a,a), caci altfel se suprapune cu finding patternurile
-            int a = 18+(version-2)*4;
-            draw_alignment(a, a, matrix);
-            break;
+    if (version == 1) return;
+
+    int v[] = {6, unu[version], doi[version], trei[version], patru[version], cinci[version], sase[version]};
+    for (int i = 0; i <= version/7 + 1; i++) {
+        for (int j = 0; j <= version/7 + 1; j++) {
+            draw_alignment(v[i],v[j],matrix);
         }
-        case 1: {                   // teoretic sunt 9 alignment patternuri, dar in practica ies 6
-            int a = 22+(version%7)*2, b = 18+(version-2)*4; // caci 3 se suprapun
-            int v[] = {6, a, b};
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 3; j++) {
-                    draw_alignment(v[i],v[j],matrix);
-                }
-            }
-            break;
-        }
-        default:
-            break;
     }
 }
 

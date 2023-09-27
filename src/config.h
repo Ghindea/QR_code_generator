@@ -10,7 +10,7 @@
 
 // QR properties
 #define version 1
-#define error_correction_level 1
+#define error_correction_level 2
 #define data_type 3
 #define mask_type 5
 // color parameters

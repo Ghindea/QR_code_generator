@@ -13,59 +13,11 @@ by [*Daniel Ghindea*](https://github.com/Ghindea)
 
 ## CONTENTS:
 
-- [Configuration parametes](#configuration-parameters)
 - [How it works](#how-it-works)
+- [Configuration parametes](#configuration-parameters)
 - [Contributors](#contributors)
 - [Bibliography](#bibliography)
 - [Licence](#license)
-
-##  SYNOPSIS:
-        ./project [OPTION]
-###  DESCRIPTION:
-        --config
-                opens header file "config.h" to edit program parameters.
-
-## CONFIGURATION PARAMETERS:
-
-1. `version`: there are fixed configurations of QR code sizes that range from 1 to 40: 
-```
-        1: 21x21; can encode up to 17 ASCII characters
-        2: 25x25; can encode up to 32 ASCII characters
-        3: 29x29; can encode up to 53 ASCII characters
-        ...
-        40: 177x177; can encode up to 2953 ASCII characters
-```                
-Currently only the first 9 versions are implemented. For more information about character capacities see [^1]
-      
-2. `mask`: certain patterns in the QR code matrix can make it difficult for QR code scanners to correctly read the code. to counteract this, the QR code specification defines 8 mask patterns:
-```
-        0: (i + j) % 2 == 0
-        1: i % 2 == 0
-        2: j % 3 == 0
-        3: (i + j) % 3 == 0
-        4: (i/2 + j/3) % 2 == 0
-        5: (i*j) % 2 + (i*j) % 3 == 0
-        6: [(i*j) % 3 + i*j ] % 2 == 0
-        7: [(i*j) % 3 + i + j] % 2 == 0
-```
-3. `error_correction`: there are 4 levels of error correction that helps QR code to stay readable even if some pixels can't be recognised by the scanner:
-```
-        0: level M - up to 15%
-        1: level L - up to 7%
-        2: level H - up to 30%
-        3: level Q - up to 25% 
-```
-4. `data_type`: QR code can hold 4 different types of data:
-```
-        1: numeric              /* not implemented */
-        2: alphanumeric         /* not implemented */
-        3: bytes
-        4: kanji                /* not implemented */
-```        
-5. `RGB` color of the QR code is determined by the given amount of red, green and blue color. their values range between 0 and 255.
-
-6. `file`: string that defines output file's name.
-
 
 ## HOW IT WORKS:
 The process of generating a QR code consists of 5 steps:
@@ -114,18 +66,122 @@ To ensure that the data is read correctly by the scanner it's required to genera
 
 Codewords obtained for "Hello world!" input in a version 1 QR code.
 
+To arrange the codewords correctly into the matrix it's necessary to break the data string into groups and groups into blocks in a suitable manner for the given version of QR code. Then,  an error correction array of codewords will be generated for every block. For more information see [^2].
+
 ---
 **PART III**
 
+Once the data has been encoded and error correction was generated it's time to place the codewords into the matrix. For this part it's required to interleave the blocks.
+
+<img style="display: block; width: 75%;"
+    src="./git_aux/interleaved.png" 
+    alt="interleaving results">
+</img>
+
+Final Message Codewords obtained for "Hello world!" input in a version 5-Q QR code.
+
+<img style="display: block; width: 50%;"
+    src="./git_aux/data_placement.png" 
+    alt="https://en.wikiversity.org/wiki/File:QR_Code_Unmasked.svg">
+</img>
+
+Placing final message codewords in a version 1 QR code.
 
 </details>
-<details><summary> Step 3: mask the data section                 </summary></details>
-<details><summary> Step 4: apply format patterns                 </summary></details>
+<details><summary> Step 3: mask the data section                 </summary>
+<br>
+To avoid the appearance of patterns that may disturb the scanning process is necessary to apply a mask. A mask pattern changes which modules are 1 and which are 0. To automaticaly determine which is the best mask a penalty score is calculated for each variant and the pattern with the lowest score is chosen.
+
+<br>
+<img style="display: block; width: 60%;"
+    src="./git_aux/mask.png " 
+    alt="https://en.wikiversity.org/wiki/File:QR_Code_Masking_Example.svg">
+</img>
+<img style="display: block; width: 60%;"
+    src="./git_aux/mask_patterns.png " 
+    alt="https://en.wikiversity.org/wiki/File:QR_Code_Mask_Patterns.svg">
+</img>
+
+[> source](https://en.wikiversity.org/wiki/Reed%E2%80%93Solomon_codes_for_coders#QR_code_structure)
+</details>
+<details><summary> Step 4: apply format patterns                 </summary>
+<br>
+The format pattern is used to encode which mask pattern and which error correction level are in use. The first 2 bits in the format string represent the error correction and the next 3 the mask applied.
+
+<br>
+
+>| EC level  | Bits | Integer Equivalent |
+>|-----------|:----:|:------------------:|
+>| L         |  01  |    1               |
+>| M         |  00  |    0               |
+>| Q         |  11  |    3               |
+>| H         |  10  |    2               |
+
+After that, the format string is processed similary to the data string, which results in a string with 15 bits that is placed like this:
+
+<img style="width: 40%;"
+    src="./git_aux/format_pattern.png " 
+    alt="format pattern"/>
+
+For versions >= 7 a special pattern is required to identify version information.
+
+<img style="width: 57%;"
+    src="./git_aux/format_special_pattern.png " 
+    alt="format pattern" />
+
+</details>
 <details><summary> Step 5: generate image based on matrix        </summary></details>
 <br>
 
 
 For detailed explanations on this topic check [bibliography](#bibliography).
+
+###  SYNOPSIS:
+        ./project [OPTION]
+###  DESCRIPTION:
+        --config
+                opens header file "config.h" to edit program parameters.
+
+## CONFIGURATION PARAMETERS:
+
+1. `version`: there are fixed configurations of QR code sizes that range from 1 to 40: 
+```
+        1: 21x21; can encode up to 17 ASCII characters
+        2: 25x25; can encode up to 32 ASCII characters
+        3: 29x29; can encode up to 53 ASCII characters
+        ...
+        40: 177x177; can encode up to 2953 ASCII characters
+```                
+Currently only the first 9 versions are implemented. For more information about character capacities see [^1]
+      
+2. `mask`: certain patterns in the QR code matrix can make it difficult for QR code scanners to correctly read the code. to counteract this, the QR code specification defines 8 mask patterns:
+```
+        0: (i + j) % 2 == 0
+        1: i % 2 == 0
+        2: j % 3 == 0
+        3: (i + j) % 3 == 0
+        4: (i/2 + j/3) % 2 == 0
+        5: (i*j) % 2 + (i*j) % 3 == 0
+        6: [(i*j) % 3 + i*j ] % 2 == 0
+        7: [(i*j) % 3 + i + j] % 2 == 0
+```
+3. `error_correction`: there are 4 levels of error correction that helps QR code to stay readable even if some pixels can't be recognised by the scanner:
+```
+        0: level M - up to 15%
+        1: level L - up to 7%
+        2: level H - up to 30%
+        3: level Q - up to 25% 
+```
+4. `data_type`: QR code can hold 4 different types of data:
+```
+        1: numeric              /* not implemented */
+        2: alphanumeric         /* not implemented */
+        3: bytes
+        4: kanji                /* not implemented */
+```        
+5. `RGB` color of the QR code is determined by the given amount of red, green and blue color. their values range between 0 and 255.
+
+6. `file`: string that defines output file's name.
 
 ## CONTRIBUTORS:
 Thanks to [radubig](https://github.com/radubig) for fixing memory leaks and overview.

@@ -158,7 +158,7 @@ For detailed explanations on this topic check [bibliography](#bibliography).
 
 ## CONFIGURATION PARAMETERS:
 
-Currently only the first 9 versions are implemented. For more information about character capacities see [^1]
+Currently only the first 27 versions are implemented. For more information about character capacities see [^1]
 1. `version`: there are fixed configurations of QR code sizes that range from 1 to 40: 
 ```
         1: 21x21; can encode up to 17 ASCII characters

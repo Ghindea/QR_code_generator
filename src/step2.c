@@ -85,15 +85,17 @@ void position_down(int *prev, char *x, char *y) {
     } else (*y)--;
     (*prev)++;
 }
-void load_codeword(char **qr, _bit_coord_ *bit, int val) {
+void load_codeword(char **qr, _bit_coord_ *bit, int val, FILE * out) {
+   
     int i = 7, msk = 1;
     // prev % 2 == 0 -> left 
     // prev % 2 == 1 -> upper-right/down-right
     while (i >= 0) {
         if (bit->x < 6 && bit->y == size - 12 && version >= 7) {
-            while (i >= 0 || bit->x < 6) {
+            while (i >= 0 && bit->x < 6) {
                 msk = 1 << i;
                 if (msk & val) qr[bit->x][bit->y] = 1;
+                fprintf(out,"(%d, %d) - %d\n", bit->x, bit->y, msk&val!=0?1:0);
                 i--; bit->x++;
             }
             if (bit->x == 6) {
@@ -109,6 +111,7 @@ void load_codeword(char **qr, _bit_coord_ *bit, int val) {
             if (available(qr, bit->x, bit->y) == 1){
                 msk = 1 << i;
                 if (msk & val) qr[bit->x][bit->y] = 1;
+                fprintf(out,"(%d, %d) - %d\n", bit->x, bit->y, msk&val!=0?1:0);
                 i--;
             } 
             if (bit->x == size - 1 && bit->y == 9) {
@@ -122,7 +125,6 @@ void load_codeword(char **qr, _bit_coord_ *bit, int val) {
                 else position_down(&bit->prev, &bit->x, &bit->y);                   // type == 2 -> down      
         }
     }
-
 }
 
 /* 
@@ -211,27 +213,29 @@ int* convert_to_INT(const uchar* v, unsigned v_size) {
 void interleave(char **qr, _groups_ *seg) {
     _bit_coord_ bit = {.x = size - 1, .y = size-1, .type = 1, .prev = 0}; 
     int min; 
-
+     FILE *out = fopen("test.txt", "w");
+     printf("%d\n", size);
     if (!seg->B2) {
         min = seg->B1;
     } else {min = seg->B1 < seg->B2 ? seg->B1:seg->B2;}
 
     for (int j = 0; j < min; j++) {
         for (int i = 0; i < seg->G1 + seg->G2; i++) {
-            load_codeword(qr, &bit, seg->data_blocks[i][j]);
+            load_codeword(qr, &bit, seg->data_blocks[i][j], out);
             // printf("%d ", seg->data_blocks[i][j]);
         }
     }
     for (int i = 0; i < seg->G2; i++) {
-        load_codeword(qr, &bit, seg->data_blocks[seg->G1 + i][seg->B2 - 1]);
+        load_codeword(qr, &bit, seg->data_blocks[seg->G1 + i][seg->B2 - 1], out);
         // printf("%d ", seg->data_blocks[seg->G1 + i][seg->B2 - 1]);
     }
     for (int j = 0; j < seg->EC; j++) {
         for (int i = 0; i < seg->G1+seg->G2; i++) {
-            load_codeword(qr, &bit, seg->ec_blocks[i][j]);
+            load_codeword(qr, &bit, seg->ec_blocks[i][j], out);
             // printf("%d ", seg->ec_blocks[i][j]);
         }
     }
+    fclose(out);
     // printf("\n\n\n");
 }
 void encode_blocks(_groups_ *seg) {

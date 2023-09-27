@@ -94,11 +94,11 @@ To avoid the appearance of patterns that may disturb the scanning process is nec
 
 <br>
 <img style="display: block; width: 60%;"
-    src="./git_aux/mask.png " 
+    src="./git_aux/mask.png" 
     alt="https://en.wikiversity.org/wiki/File:QR_Code_Masking_Example.svg">
 </img>
 <img style="display: block; width: 60%;"
-    src="./git_aux/mask_patterns.png " 
+    src="./git_aux/mask_patterns.png" 
     alt="https://en.wikiversity.org/wiki/File:QR_Code_Mask_Patterns.svg">
 </img>
 
@@ -120,13 +120,13 @@ The format pattern is used to encode which mask pattern and which error correcti
 After that, the format string is processed similary to the data string, which results in a string with 15 bits that is placed like this:
 
 <img style="width: 40%;"
-    src="./git_aux/format_pattern.png " 
+    src="./git_aux/format_pattern.png" 
     alt="format pattern"/>
 
 For versions >= 7 a special pattern is required to identify version information.
 
 <img style="width: 57%;"
-    src="./git_aux/format_special_pattern.png " 
+    src="./git_aux/format_special_pattern.png" 
     alt="format pattern" />
 
 </details>

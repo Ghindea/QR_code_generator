@@ -57,7 +57,7 @@ Next, the *Character Count Indicator* needs to be added in a group of x bits, wh
 ---
 **PART II** 
 
-To ensure that the data is read correctly by the scanner it's required to generate error correction codewords for comparison. This process uses Reed-Solomon method for error correction. In a nutshell, it performs a polynomial division between the polynomial with coefficients made of data string elements and the generator polynomial (check Reed-Solomon documentation). The key of this process is finite field arithmetic ( GF(256) ).
+To ensure that the data is read correctly by the scanner it's required to generate error correction codewords for comparison. This process uses *Reed-Solomon method* for error correction. In a nutshell, it performs a polynomial division between the polynomial with coefficients made of data string elements and the generator polynomial (check Reed-Solomon documentation). The key of this process is finite field arithmetic ( GF(256) ).
 
 <img style="display: block; width: 75%;"
     src="./git_aux/codewords.png" 
@@ -130,7 +130,21 @@ For versions >= 7 a special pattern is required to identify version information.
     alt="format pattern" />
 
 </details>
-<details><summary> Step 5: generate image based on matrix        </summary></details>
+<details><summary> Step 5: generate image based on matrix        </summary>
+<br>
+Currently the only image format that can be generated is .pmm. Its structure is quite simple:
+
+>       P6              # magic number 
+>       115 115         # image width & height
+>       255             # maximum color value (ranges between 0-255)
+>       0 0 0     0  0  0     0 1 0  ...        # (width * height) groups of binary data
+>       5 1 8     11 3 12     4 6 11 ...        # that represent the RGB color values 
+>       ...       ...         ...               # of each corresponding pixel 
+
+Since a QR code only has values of 0s and 1s, the .ppm file will contain only white pixels (255 255 255) and a specific color (0 0 0 - black by default). Because the dimensions of the data matrix depends on the selected version a scale variable was implemented to make images of the same size.
+
+.png image format will be implemented soon 
+</details>
 <br>
 
 
@@ -144,6 +158,7 @@ For detailed explanations on this topic check [bibliography](#bibliography).
 
 ## CONFIGURATION PARAMETERS:
 
+Currently only the first 9 versions are implemented. For more information about character capacities see [^1]
 1. `version`: there are fixed configurations of QR code sizes that range from 1 to 40: 
 ```
         1: 21x21; can encode up to 17 ASCII characters
@@ -152,7 +167,6 @@ For detailed explanations on this topic check [bibliography](#bibliography).
         ...
         40: 177x177; can encode up to 2953 ASCII characters
 ```                
-Currently only the first 9 versions are implemented. For more information about character capacities see [^1]
       
 2. `mask`: certain patterns in the QR code matrix can make it difficult for QR code scanners to correctly read the code. to counteract this, the QR code specification defines 8 mask patterns:
 ```
@@ -183,6 +197,8 @@ Currently only the first 9 versions are implemented. For more information about 
 
 6. `file`: string that defines output file's name.
 
+7. `scale`: factor used to determine the final size of the generated image
+
 ## CONTRIBUTORS:
 Thanks to [radubig](https://github.com/radubig) for fixing memory leaks and overview.
 
@@ -190,7 +206,7 @@ Thanks to [radubig](https://github.com/radubig) for fixing memory leaks and over
 - [Thonky QR code tutorial](https://www.thonky.com/qr-code-tutorial/)
 - [Reed-Solomon CFC](https://en.wikiversity.org/wiki/Reed%E2%80%93Solomon_codes_for_coders)
 - [Reed-Solomon EC](https://en.wikipedia.org/wiki/Reed%E2%80%93Solomon_error_correction)
-- [Polinomials](https://en.wikipedia.org/wiki/Polynomial_code)
+- [Polynomials](https://en.wikipedia.org/wiki/Polynomial_code)
 
 ## LICENSE:
 Content is published under [MIT Licence](https://en.wikipedia.org/wiki/MIT_License). For more information check [LICENSE.md](https://github.com/Ghindea/QR_code_beta/blob/master/LICENSE.md)

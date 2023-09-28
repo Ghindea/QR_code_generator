@@ -9,15 +9,15 @@
 // step 4: apply format patterns
 
 // QR properties
-#define version 5
+#define version 40
 #define error_correction_level 1
 #define data_type 3
 #define mask_type 3
 // color parameters
-#define red 173
-#define green 23
-#define blue 48
+#define red 0
+#define green 0
+#define blue 0
 // file name
 #define file "QR.ppm"
-#define scale 10
+#define scale 5
 

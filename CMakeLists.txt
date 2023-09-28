@@ -1,16 +1,18 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(QR_code LANGUAGES C)
+project(qr LANGUAGES C)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
-add_compile_options(-fsanitize=address)
-add_link_options(-fsanitize=address)
-
 if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "Debug")
+    set(CMAKE_BUILD_TYPE "Release")
+endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_compile_options(-fsanitize=address)
+    add_link_options(-fsanitize=address)
 endif()
 
 option(MakePNG "Produce PNG files using stb_image_write" OFF)
@@ -37,3 +39,8 @@ install(TARGETS ${PROJECT_NAME} DESTINATION bin)
 install(DIRECTORY src/utils DESTINATION bin)
 
 # NOTE: wut is going on here?
+# NOTE (radubig): This is a script that generates the corresponding makefile for every platform and build system
+# supported by cmake. As such, you don't have to write different makefiles for different platforms.
+# Also, CMakeLists.txt allows certain IDE's (eg. CLion) to understand the structure of a project.
+
+# TODO (Ghindea): Merge this PR into main repository

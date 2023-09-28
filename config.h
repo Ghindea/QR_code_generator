@@ -14,9 +14,9 @@
 #define data_type 3
 #define mask_type 3
 // color parameters
-#define red 0
-#define green 0
-#define blue 0
+#define red 173
+#define green 23
+#define blue 48
 // file name
 #define file "QR.ppm"
 #define scale 10

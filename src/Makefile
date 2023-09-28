@@ -10,4 +10,4 @@ valgrind:
 	valgrind --leak-check=yes --track-origins=yes ./qr
 
 clean:
-	rm qr QR.ppm
+	@rm qr QR.ppm

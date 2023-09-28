@@ -104,7 +104,6 @@ polynomial poly_multiplication(polynomial P1, polynomial P2, tables t) {
                 } 
             }
         }
-    // normalise(&P3); // leading term must be non-zero
 
     return P3;
 }

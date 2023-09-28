@@ -10,7 +10,8 @@
 #define uchar unsigned char 
 
 typedef struct {
-    char x, y, type;
+    unsigned char x, y;
+    char type;
     int prev;
 }_bit_coord_;
 

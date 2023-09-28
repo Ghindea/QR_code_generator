@@ -19,3 +19,5 @@ add_executable(${PROJECT_NAME} ${Src})
 # NOTE: installing will only work after automating config editing
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
 install(DIRECTORY src/utils DESTINATION bin)
+
+# NOTE: wut is going on here?

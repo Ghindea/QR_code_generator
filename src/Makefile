@@ -1,13 +1,13 @@
 CC = gcc
 CFLAGS = -g -std=c11 -fsanitize=address #-Wall
 build:
-	@$(CC) *.c $(CFLAGS) -o project
+	@$(CC) *.c $(CFLAGS) -o qr
 
 run: build
-	@./project
+	@./qr
 
 valgrind: 
-	valgrind --leak-check=yes --track-origins=yes ./project
+	valgrind --leak-check=yes --track-origins=yes ./qr
 
 clean:
-	rm project QR.ppm
+	rm qr QR.ppm

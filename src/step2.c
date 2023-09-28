@@ -58,8 +58,8 @@ unsigned int load_capacity_data(FILE *in) {
     }
     return x;
 }
-int available(char **qr, char x, char y) {        // checks if module coordonates are available to place data
-    char aux = size;
+int available(char **qr, unsigned char x, unsigned char y) {        // checks if module coordonates are available to place data
+    unsigned char aux = size;
     if (x < 0 || x >= aux || y < 0 || y >=aux) return 2;    // matrix limits
     if (x > -1 && x < 9 && y >-1 && y < 9) return 2;        // find pttrn up left
     if (x > size-9 && x < size && y > -1 && y < 9) return 2;// find pttrn dwn left
@@ -73,19 +73,19 @@ int available(char **qr, char x, char y) {        // checks if module coordonate
 
     return 1;
 }
-void position_up(int *prev, char *x, char *y) {
+void position_up(int *prev, unsigned char *x, unsigned char *y) {
     if ((*prev) % 2 != 0) {
         (*x)--; (*y)++;
     } else (*y)--;
     (*prev)++;
 }
-void position_down(int *prev, char *x, char *y) {
+void position_down(int *prev, unsigned char *x, unsigned char *y) {
     if ((*prev) % 2 != 0) {
         (*x)++; (*y)++;
     } else (*y)--;
     (*prev)++;
 }
-void load_codeword(char **qr, _bit_coord_ *bit, int val, FILE * out) {
+void load_codeword(char **qr, _bit_coord_ *bit, int val) {
    
     int i = 7, msk = 1;
     // prev % 2 == 0 -> left 
@@ -95,7 +95,6 @@ void load_codeword(char **qr, _bit_coord_ *bit, int val, FILE * out) {
             while (i >= 0 && bit->x < 6) {
                 msk = 1 << i;
                 if (msk & val) qr[bit->x][bit->y] = 1;
-                fprintf(out,"(%d, %d) - %d\n", bit->x, bit->y, msk&val!=0?1:0);
                 i--; bit->x++;
             }
             if (bit->x == 6) {
@@ -111,7 +110,6 @@ void load_codeword(char **qr, _bit_coord_ *bit, int val, FILE * out) {
             if (available(qr, bit->x, bit->y) == 1){
                 msk = 1 << i;
                 if (msk & val) qr[bit->x][bit->y] = 1;
-                fprintf(out,"(%d, %d) - %d\n", bit->x, bit->y, msk&val!=0?1:0);
                 i--;
             } 
             if (bit->x == size - 1 && bit->y == 9) {
@@ -213,30 +211,23 @@ int* convert_to_INT(const uchar* v, unsigned v_size) {
 void interleave(char **qr, _groups_ *seg) {
     _bit_coord_ bit = {.x = size - 1, .y = size-1, .type = 1, .prev = 0}; 
     int min; 
-     FILE *out = fopen("test.txt", "w");
-     printf("%d\n", size);
     if (!seg->B2) {
         min = seg->B1;
     } else {min = seg->B1 < seg->B2 ? seg->B1:seg->B2;}
 
     for (int j = 0; j < min; j++) {
         for (int i = 0; i < seg->G1 + seg->G2; i++) {
-            load_codeword(qr, &bit, seg->data_blocks[i][j], out);
-            // printf("%d ", seg->data_blocks[i][j]);
+            load_codeword(qr, &bit, seg->data_blocks[i][j]);
         }
     }
     for (int i = 0; i < seg->G2; i++) {
-        load_codeword(qr, &bit, seg->data_blocks[seg->G1 + i][seg->B2 - 1], out);
-        // printf("%d ", seg->data_blocks[seg->G1 + i][seg->B2 - 1]);
+        load_codeword(qr, &bit, seg->data_blocks[seg->G1 + i][seg->B2 - 1]);
     }
     for (int j = 0; j < seg->EC; j++) {
         for (int i = 0; i < seg->G1+seg->G2; i++) {
-            load_codeword(qr, &bit, seg->ec_blocks[i][j], out);
-            // printf("%d ", seg->ec_blocks[i][j]);
+            load_codeword(qr, &bit, seg->ec_blocks[i][j]);
         }
     }
-    fclose(out);
-    // printf("\n\n\n");
 }
 void encode_blocks(_groups_ *seg) {
     int cont = 0; int *tmp = (int*)calloc(seg->B1 > seg->B2 ? seg->B1:seg->B2, sizeof(int));
@@ -329,7 +320,6 @@ int fill_data(char **matrix) {
 
     fclose(in); fclose(fin); fclose(cin);
 
-    // printf("\n\n");
     char *msg_in = (char *)calloc(MAXLEN, sizeof(char));
     fgets(msg_in, MAXLEN, stdin);
 

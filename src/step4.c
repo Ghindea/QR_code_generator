@@ -52,7 +52,6 @@ void apply_version_format(char **qr) {
     for (int i = 7; i <= version; i++) {
         fscanf(input, "%s", string);
     }
-    printf("%s\n", string);
     int cont = 0;
     for (int j = 5; j >= 0; j--) {
         for (int i = 2; i >= 0; i--) {
@@ -68,7 +67,6 @@ void apply_format(char **qr, int mask) {
     FILE *din = fopen("utils/format_information_string.txt", "r");
     char *format_string = load_format(din, mask);
 
-    printf("%s\n", format_string);
     for (int i = 0; i <= 6; i++) {
         qr[8][i] = format_string[i] - '0';
         qr[size - 1 - i][8] = format_string[i] - '0';

@@ -24,7 +24,6 @@ void error(int x) {
 }
 void printMatrix(char **matrice) {
     for (int i = 0; i < size; i++) {
-        // printf("%d ", i);
         for (int j = 0; j < size; j++) {
             printf("%d", matrice[i][j]);
         }

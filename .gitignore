@@ -3,3 +3,4 @@ aux.c
 *.json
 src/project
 src/*.png
+src/qr

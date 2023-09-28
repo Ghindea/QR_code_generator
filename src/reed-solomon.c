@@ -37,8 +37,6 @@ void normalise(polynomial * P) { // TO DO: realloc memory
         first_zero--;
     }
     if (first_zero != P->grad) {
-        // int *tmp = realloc(P->coef, (first_zero+1) * sizeof(int));   
-        // P->coef = tmp;
         P->grad = first_zero;
     }
 }
@@ -104,7 +102,6 @@ polynomial poly_multiplication(polynomial P1, polynomial P2, tables t) {
                 } 
             }
         }
-    // normalise(&P3); // leading term must be non-zero
 
     return P3;
 }

@@ -1,6 +1,6 @@
 #include "header.h"
-int boundary(char **qr, char x, char y) {        // checks if module coordonates are available to place data
-    char aux = size;
+int boundary(char **qr, unsigned char x, unsigned char y) {        // checks if module coordonates are available to place data
+    unsigned aux = size;
     if (x < 0 || x >= aux || y < 0 || y >=aux) return 2;    // matrix limits
     if (x > -1 && x < 9 && y >-1 && y < 9) return 2;        // find pttrn up left
     if (x > size-9 && x < size && y > -1 && y < 9) return 2;// find pttrn dwn left
@@ -78,7 +78,8 @@ void mask_matrix(char **qr) {
     apply_mask(qr, parse_function(index));
     apply_format(qr, index);
 #else                   // mask type is custom set
-    apply_mask(qr, parse_function(mask_type));
+    fct ptr = parse_function(mask_type);
+    apply_mask(qr, ptr);
     apply_format(qr, mask_type);
 #endif
 

@@ -10,7 +10,8 @@
 #define uchar unsigned char 
 
 typedef struct {
-    char x, y, type;
+    unsigned char x, y;
+    char type;
     int prev;
 }_bit_coord_;
 
@@ -45,7 +46,7 @@ int fill_data(char **);                // step 2
 void mask_matrix(char **);             // step 3
 void apply_format(char **, int);       // step 4
 
-int _is_set(char, int);
+int _is_set(void *, int, char);
 void bitprint(int);         //
 void error(int);            //
 void printMatrix(char **);  //

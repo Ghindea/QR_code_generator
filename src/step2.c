@@ -58,8 +58,8 @@ unsigned int load_capacity_data(FILE *in) {
     }
     return x;
 }
-int available(char **qr, char x, char y) {        // checks if module coordonates are available to place data
-    char aux = size;
+int available(char **qr, unsigned char x, unsigned char y) {        // checks if module coordonates are available to place data
+    unsigned char aux = size;
     if (x < 0 || x >= aux || y < 0 || y >=aux) return 2;    // matrix limits
     if (x > -1 && x < 9 && y >-1 && y < 9) return 2;        // find pttrn up left
     if (x > size-9 && x < size && y > -1 && y < 9) return 2;// find pttrn dwn left
@@ -73,25 +73,26 @@ int available(char **qr, char x, char y) {        // checks if module coordonate
 
     return 1;
 }
-void position_up(int *prev, char *x, char *y) {
+void position_up(int *prev, unsigned char *x, unsigned char *y) {
     if ((*prev) % 2 != 0) {
         (*x)--; (*y)++;
     } else (*y)--;
     (*prev)++;
 }
-void position_down(int *prev, char *x, char *y) {
+void position_down(int *prev, unsigned char *x, unsigned char *y) {
     if ((*prev) % 2 != 0) {
         (*x)++; (*y)++;
     } else (*y)--;
     (*prev)++;
 }
 void load_codeword(char **qr, _bit_coord_ *bit, int val) {
+   
     int i = 7, msk = 1;
     // prev % 2 == 0 -> left 
     // prev % 2 == 1 -> upper-right/down-right
     while (i >= 0) {
         if (bit->x < 6 && bit->y == size - 12 && version >= 7) {
-            while (i >= 0 || bit->x < 6) {
+            while (i >= 0 && bit->x < 6) {
                 msk = 1 << i;
                 if (msk & val) qr[bit->x][bit->y] = 1;
                 i--; bit->x++;
@@ -122,7 +123,6 @@ void load_codeword(char **qr, _bit_coord_ *bit, int val) {
                 else position_down(&bit->prev, &bit->x, &bit->y);                   // type == 2 -> down      
         }
     }
-
 }
 
 /* 
@@ -136,26 +136,24 @@ void load_codeword(char **qr, _bit_coord_ *bit, int val) {
 */
 uchar * data_codewords(char *msg_in, unsigned codewords) {
 
-    uchar * data = (uchar *) calloc(codewords + 1, sizeof(uchar));  // alocate extra byte for null character
-    uchar _mask = 1;
+    uchar * data = (uchar *) calloc(codewords + 1, sizeof(uchar));
+    int _mask = 1;
     data[0] = 1 << (data_type + 3);     // data_type 
-	int byte = 0;   // byte_old
+	int byte = 0, len = strlen(msg_in) - 1, bit = 3;
 	for (int i = len_bit_no()-1; i >= 0; i--) { // len
-        _mask = 1 << i;
-        _mask &= (strlen(msg_in)-1);
-        if (i == 3) byte++;
-        if (i >= 4) {
-            _mask >>= 4;
+        if (_is_set(&len, i, 1)) {
+            data[byte] |= 1 << bit;
         } else {
-            _mask <<=4;
+            data[byte] &= ~(1 << bit);
         }
-        data[byte] ^= _mask;
+        bit--;
+        if (bit < 0) {bit = 7; byte++;}
     }
     int k = 4 + len_bit_no();
     int new = k % 8, old = 0;
-    int byte_old = strlen(msg_in)-2, byte_new = byte_old + 1  + (k/8);
-    for (int i = 1; i <= (strlen(msg_in)-1)*8; i++) {
-        if (_is_set(msg_in[byte_old], old)) {
+    int byte_old = len - 1, byte_new = byte_old + 1  + (k/8);
+    for (int i = 1; i <= (len)*8; i++) {
+        if (_is_set(&msg_in[byte_old], old, 0)) {
             data[byte_new] |= 1 << new;     // set bit
         } else {
             data[byte_new] &= ~(1 << new);   // unset bit
@@ -173,7 +171,34 @@ uchar * data_codewords(char *msg_in, unsigned codewords) {
 
 	return data;
 }
-
+void debug(_groups_ *segments) {
+    printf("\n\nRESULTS\n=====================================================\n");
+        for (int i = 0; i < segments->G1; i++) {
+            printf("block %d - %d codewords:    ", i, segments->B1);
+            for (int j = 0; j < segments->B1; j++) {
+                printf("%d,", segments->data_blocks[i][j]);
+            }printf("\n");
+        }
+        for (int i = 0; i < segments->G2; i++) {
+            printf("block %d - %d codewords:    ", segments->G1 + i, segments->B2);
+            for (int j = 0; j < segments->B2; j++) {
+                printf("%d,", segments->data_blocks[segments->G1 + i][j]);
+            }printf("\n");
+        }
+        printf("\n=====================================================\n");
+        for (int i = 0; i < segments->G1 + segments->G2; i++) {
+            printf("block %d - %d ec_codewords: ", i, segments->EC);
+            for (int j = 0; j < segments->EC; j++) {
+                printf("%d,", segments->ec_blocks[i][j]);
+            }
+            printf("\n");
+        }
+        printf("\n=====================================================\n");
+        printf("total codewords: %d\n\n\n", segments->G1 * segments->B1 + segments->G2 * segments->B2 + segments->EC);
+        
+        
+        printf("INTERLEAVED CODEWORDS\n=====================================================\n");
+}
 /* This function passes ownership of the allocated array */
 int* convert_to_INT(const uchar* v, unsigned v_size) {
 	int * w = (int *) calloc(v_size,sizeof(int));
@@ -186,7 +211,6 @@ int* convert_to_INT(const uchar* v, unsigned v_size) {
 void interleave(char **qr, _groups_ *seg) {
     _bit_coord_ bit = {.x = size - 1, .y = size-1, .type = 1, .prev = 0}; 
     int min; 
-
     if (!seg->B2) {
         min = seg->B1;
     } else {min = seg->B1 < seg->B2 ? seg->B1:seg->B2;}
@@ -194,20 +218,16 @@ void interleave(char **qr, _groups_ *seg) {
     for (int j = 0; j < min; j++) {
         for (int i = 0; i < seg->G1 + seg->G2; i++) {
             load_codeword(qr, &bit, seg->data_blocks[i][j]);
-            // printf("%d ", seg->data_blocks[i][j]);
         }
     }
     for (int i = 0; i < seg->G2; i++) {
         load_codeword(qr, &bit, seg->data_blocks[seg->G1 + i][seg->B2 - 1]);
-        // printf("%d ", seg->data_blocks[seg->G1 + i][seg->B2 - 1]);
     }
     for (int j = 0; j < seg->EC; j++) {
         for (int i = 0; i < seg->G1+seg->G2; i++) {
             load_codeword(qr, &bit, seg->ec_blocks[i][j]);
-            // printf("%d ", seg->ec_blocks[i][j]);
         }
     }
-    // printf("\n\n\n");
 }
 void encode_blocks(_groups_ *seg) {
     int cont = 0; int *tmp = (int*)calloc(seg->B1 > seg->B2 ? seg->B1:seg->B2, sizeof(int));
@@ -300,7 +320,6 @@ int fill_data(char **matrix) {
 
     fclose(in); fclose(fin); fclose(cin);
 
-    // printf("\n\n");
     char *msg_in = (char *)calloc(MAXLEN, sizeof(char));
     fgets(msg_in, MAXLEN, stdin);
 
@@ -311,32 +330,7 @@ int fill_data(char **matrix) {
 
         separate_blocks(int_data_string, segments);
         encode_blocks(segments);
-        // printf("\n\nRESULTS\n=====================================================\n");
-        // for (int i = 0; i < segments->G1; i++) {
-        //     printf("block %d - %d codewords:    ", i, segments->B1);
-        //     for (int j = 0; j < segments->B1; j++) {
-        //         printf("%d,", segments->data_blocks[i][j]);
-        //     }printf("\n");
-        // }
-        // for (int i = 0; i < segments->G2; i++) {
-        //     printf("block %d - %d codewords:    ", segments->G1 + i, segments->B2);
-        //     for (int j = 0; j < segments->B2; j++) {
-        //         printf("%d,", segments->data_blocks[segments->G1 + i][j]);
-        //     }printf("\n");
-        // }
-        // printf("\n=====================================================\n");
-        // for (int i = 0; i < segments->G1 + segments->G2; i++) {
-        //     printf("block %d - %d ec_codewords: ", i, segments->EC);
-        //     for (int j = 0; j < segments->EC; j++) {
-        //         printf("%d,", segments->ec_blocks[i][j]);
-        //     }
-        //     printf("\n");
-        // }
-        // printf("\n=====================================================\n");
-        // printf("total codewords: %d\n\n\n", segments->G1 * segments->B1 + segments->G2 * segments->B2 + segments->EC);
-        
-        
-        // printf("INTERLEAVED CODEWORDS\n=====================================================\n");
+        // debug(segments);
         interleave(matrix, segments);
 
         free(msg_in);

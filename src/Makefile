@@ -5,16 +5,16 @@ MAKEPNG = false
 
 build:
 ifeq ($(MAKEPNG), true)
-	@$(CC) -DQRCODE_MAKE_PNG *.c dep/stb_image_write.c $(CFLAGS) -o project
+	@$(CC) -DQRCODE_MAKE_PNG *.c dep/stb_image_write.c $(CFLAGS) -o qr
 else
-	@$(CC) *.c $(CFLAGS) -o project
+	@$(CC) *.c $(CFLAGS) -o qr
 endif
 
 run: build
-	@./project
+	@./qr
 
 valgrind: 
-	valgrind --leak-check=yes --track-origins=yes ./project
+	valgrind --leak-check=yes --track-origins=yes ./qr
 
 clean:
-	rm project QR.ppm
+	rm qr QR.ppm

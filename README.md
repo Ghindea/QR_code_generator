@@ -3,7 +3,7 @@
            margin-left: auto;
            margin-right: auto;
            width: 30%;"
-    src="./QR.png" 
+    src="./git_aux/QR.png" 
     alt="https://github.com/Ghindea/QR_code_beta">
 </img>
 # **QR Code Generator**

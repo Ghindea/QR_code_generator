@@ -307,18 +307,18 @@ _groups_ * alloc_groups(int ec_no) {
 
     return seg;
 }
-
 int fill_data(char **matrix) {
-    FILE *in  = fopen(mode_path, "r");
-    FILE *fin = fopen("utils/data_codewords_capacity.txt", "r");
-    FILE *cin = fopen("utils/ec_codewords_capacity.txt","r");
+    // FILE *in  = fopen(mode_path, "r");
+    // FILE *fin = fopen("utils/data_codewords_capacity.txt", "r");
+    // FILE *cin = fopen("utils/ec_codewords_capacity.txt","r");
     
-    unsigned capacity = load_capacity_data(in);
-	unsigned codewords = load_capacity_data(fin);
-    unsigned ECcodewords = load_capacity_data(cin);
+    unsigned capacity    = MODE[config];
+    unsigned codewords   = DATA_CODEWORDS[config];
+    unsigned ECcodewords = EC_CODEWORDS[config];
     _groups_ * segments = alloc_groups(ECcodewords);
 
-    fclose(in); fclose(fin); fclose(cin);
+ 
+    // fclose(in); fclose(fin); fclose(cin);
 
     char *msg_in = (char *)calloc(MAXLEN, sizeof(char));
     fgets(msg_in, MAXLEN, stdin);

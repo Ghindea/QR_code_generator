@@ -165,7 +165,7 @@ For detailed explanations on this topic check [bibliography](#bibliography).
 
 Currently all versions are implemented. For more information about character capacities see [^1]
 1. `version`: there are fixed configurations of QR code sizes that range from 1 to 40: 
-```c
+```
         1: 21 x 21; can encode up to 17 ASCII characters
         2: 25 x 25; can encode up to 32 ASCII characters
         3: 29 x 29; can encode up to 53 ASCII characters
@@ -173,14 +173,14 @@ Currently all versions are implemented. For more information about character cap
         40: 177 x 177; can encode up to 2953 ASCII characters
 ```                
 2. `error_correction_level`: there are 4 levels of error correction that helps QR code to stay readable even if some pixels can't be recognised by the scanner:
-```c
+```
         0: level M - up to 15%
         1: level L - up to 7%
         2: level H - up to 30%
         3: level Q - up to 25% 
 ```
 3. `data_type`: QR code can hold 4 different types of data:
-```c
+```
         1: numeric              /* not implemented */
         2: alphanumeric         /* not implemented */
         3: bytes
@@ -188,7 +188,7 @@ Currently all versions are implemented. For more information about character cap
 ```        
       
 4. `mask_type`: certain patterns in the QR code matrix can make it difficult for QR code scanners to correctly read the code. to counteract this, the QR code specification defines 8 mask patterns:
-```c
+```
         0: (i + j) % 2 == 0
         1: i % 2 == 0
         2: j % 3 == 0
@@ -202,9 +202,9 @@ Currently all versions are implemented. For more information about character cap
 
 6. `file`: string that defines output file's name and format.
 ```bash
-        QR.ppm  #.ppm file
-        QR.png  #.png file
-        QR.jpg  #.jpg file
+        name.ppm  #.ppm file
+        name.png  #.png file
+        name.jpg  #.jpg file
 ```
 
 7. `scale`: factor used to determine the final size of the generated image

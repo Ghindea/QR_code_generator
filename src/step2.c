@@ -319,7 +319,7 @@ int fill_data(char **matrix) {
 
  
     // fclose(in); fclose(fin); fclose(cin);
-
+    printf("Insert text: ");
     char *msg_in = (char *)calloc(MAXLEN, sizeof(char));
     fgets(msg_in, MAXLEN, stdin);
 

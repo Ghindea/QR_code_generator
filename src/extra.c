@@ -30,69 +30,6 @@ void printMatrix(char **matrice) {
         printf("\n");
     }
 }
-void makeQR(char **matrix) {
-    FILE *out = fopen(file, "w+");
-    fprintf(out, "P6\n");
-
-    const int img_line_len = scale * (size + 2);
-    fprintf(out, "%d %d\n255\n", img_line_len, img_line_len);
-    uchar alb = 255, r = red, g = green, b = blue;
-
-    // top padding
-    for (int i = 1; i <= scale; i++) {
-        for (int j = 1; j <= img_line_len; j++) {
-            fwrite(&alb, sizeof(uchar), 1, out);
-            fwrite(&alb, sizeof(uchar), 1, out);
-            fwrite(&alb, sizeof(uchar), 1, out);
-        }
-    }
-
-    // qr code data
-    for (int i = 0; i < size; i++) {
-        for (int k = 1; k <= scale; k++) {
-
-            // left padding
-            for (int m = 1; m <= scale; m++) {
-                fwrite(&alb, sizeof(uchar), 1, out);
-                fwrite(&alb, sizeof(uchar), 1, out);
-                fwrite(&alb, sizeof(uchar), 1, out);
-            }
-
-            // QR pixel data
-            for (int j = 0 ; j < size; j++) {
-                for (int l = 1; l <= scale; l++) {
-                    if (matrix[i][j] % 2) {
-                        fwrite(&r, sizeof(uchar), 1, out);
-                        fwrite(&g, sizeof(uchar), 1, out);
-                        fwrite(&b, sizeof(uchar), 1, out);
-                    } else {
-                        fwrite(&alb, sizeof(uchar), 1, out);
-                        fwrite(&alb, sizeof(uchar), 1, out);
-                        fwrite(&alb, sizeof(uchar), 1, out);
-                    }
-                }
-            }
-
-            // right padding
-            for (int m = 1; m <= scale; m++) {
-                fwrite(&alb, sizeof(uchar), 1, out);
-                fwrite(&alb, sizeof(uchar), 1, out);
-                fwrite(&alb, sizeof(uchar), 1, out);
-            }
-        }
-    }
-
-    // top padding
-    for (int i = 1; i <= scale; i++) {
-        for (int j = 1; j <= img_line_len; j++) {
-            fwrite(&alb, sizeof(uchar), 1, out);
-            fwrite(&alb, sizeof(uchar), 1, out);
-            fwrite(&alb, sizeof(uchar), 1, out);
-        }
-    }
-
-    fclose(out);
-}
 
 void invert_int_array (int * arr, unsigned int end) {
     int tmp;

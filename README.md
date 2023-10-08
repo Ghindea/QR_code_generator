@@ -9,7 +9,7 @@
 # **QR Code Generator**
 by [*Daniel Ghindea*](https://github.com/Ghindea)
 
- The QR Code is generated as a .ppm image and its properties (version, color, error_correction and more) are all customizable. A future version of this program will focus on generating a more versatile image format (.png, .jpg, etc.). Currently the program has been tested on Linux.
+ The QR Code is generated as a .ppm/.png/.jpg image and its properties (version, color, error_correction and more) are all customizable. Currently the program has been tested on Linux.
 
 ## CONTENTS:
 
@@ -150,6 +150,11 @@ Since a QR code only has values of 0s and 1s, the .ppm file will contain only wh
 
 For detailed explanations on this topic check [bibliography](#bibliography).
 
+### MAKEFILE:
+```bash       
+    make build      # compile
+    make clean      # cleanup
+```
 ###  SYNOPSIS:
         ./qr [OPTION]
 ###  DESCRIPTION:
@@ -160,16 +165,30 @@ For detailed explanations on this topic check [bibliography](#bibliography).
 
 Currently all versions are implemented. For more information about character capacities see [^1]
 1. `version`: there are fixed configurations of QR code sizes that range from 1 to 40: 
-```
-        1: 21x21; can encode up to 17 ASCII characters
-        2: 25x25; can encode up to 32 ASCII characters
-        3: 29x29; can encode up to 53 ASCII characters
+```c
+        1: 21 x 21; can encode up to 17 ASCII characters
+        2: 25 x 25; can encode up to 32 ASCII characters
+        3: 29 x 29; can encode up to 53 ASCII characters
         ...
-        40: 177x177; can encode up to 2953 ASCII characters
+        40: 177 x 177; can encode up to 2953 ASCII characters
 ```                
-      
-2. `mask`: certain patterns in the QR code matrix can make it difficult for QR code scanners to correctly read the code. to counteract this, the QR code specification defines 8 mask patterns:
+2. `error_correction_level`: there are 4 levels of error correction that helps QR code to stay readable even if some pixels can't be recognised by the scanner:
+```c
+        0: level M - up to 15%
+        1: level L - up to 7%
+        2: level H - up to 30%
+        3: level Q - up to 25% 
 ```
+3. `data_type`: QR code can hold 4 different types of data:
+```c
+        1: numeric              /* not implemented */
+        2: alphanumeric         /* not implemented */
+        3: bytes
+        4: kanji                /* not implemented */
+```        
+      
+4. `mask_type`: certain patterns in the QR code matrix can make it difficult for QR code scanners to correctly read the code. to counteract this, the QR code specification defines 8 mask patterns:
+```c
         0: (i + j) % 2 == 0
         1: i % 2 == 0
         2: j % 3 == 0
@@ -179,23 +198,14 @@ Currently all versions are implemented. For more information about character cap
         6: [(i*j) % 3 + i*j ] % 2 == 0
         7: [(i*j) % 3 + i + j] % 2 == 0
 ```
-3. `error_correction`: there are 4 levels of error correction that helps QR code to stay readable even if some pixels can't be recognised by the scanner:
-```
-        0: level M - up to 15%
-        1: level L - up to 7%
-        2: level H - up to 30%
-        3: level Q - up to 25% 
-```
-4. `data_type`: QR code can hold 4 different types of data:
-```
-        1: numeric              /* not implemented */
-        2: alphanumeric         /* not implemented */
-        3: bytes
-        4: kanji                /* not implemented */
-```        
 5. `RGB` color of the QR code is determined by the given amount of red, green and blue color. their values range between 0 and 255.
 
-6. `file`: string that defines output file's name.
+6. `file`: string that defines output file's name and format.
+```bash
+        QR.ppm  #.ppm file
+        QR.png  #.png file
+        QR.jpg  #.jpg file
+```
 
 7. `scale`: factor used to determine the final size of the generated image
 
@@ -207,6 +217,7 @@ Thanks to [radubig](https://github.com/radubig) for fixing memory leaks and over
 - [Reed-Solomon CFC](https://en.wikiversity.org/wiki/Reed%E2%80%93Solomon_codes_for_coders)
 - [Reed-Solomon EC](https://en.wikipedia.org/wiki/Reed%E2%80%93Solomon_error_correction)
 - [Polynomials](https://en.wikipedia.org/wiki/Polynomial_code)
+- [stb library for image formats](https://github.com/nothings/stb)
 
 ## LICENSE:
 Content is published under [MIT Licence](https://en.wikipedia.org/wiki/MIT_License). For more information check [LICENSE.md](https://github.com/Ghindea/QR_code_beta/blob/master/LICENSE.md)

@@ -41,19 +41,24 @@ void normalise(polynomial *);
 
 /* multi file functions*/
 char **initMatrix();                   // step 1
-void free_matrix(char **);
 int fill_data(char **);                // step 2
 void mask_matrix(char **);             // step 3
 void apply_format(char **, int);       // step 4
 
+/* auxiliary functions (extra.c) */
+void error(int);                        
+void bitprint(int);                     
+void printMatrix(char **);              
 int _is_set(void *, int, char);
-void bitprint(int);         //
-void error(int);            //
-void printMatrix(char **);  //
-void makeQR(char **);       // auxiliary functions (extra.c)
 void invert_int_array (int* arr, unsigned int end);
 
+/* QR file format */
+void make_PPM(char **);
+void make_PNG(char **); 
+void make_JPG(char **); 
+
 /* custom free functions */
+void free_matrix(char **);
 void free_polynomial(polynomial*);
 void free_tables(tables*);
 void free_groups(_groups_*);

@@ -209,6 +209,24 @@ Currently all versions are implemented. For more information about character cap
 
 7. `scale`: factor used to determine the final size of the generated image
 
+### Example of configuration 
+```c
+config.h:
+    // QR properties
+    #define version 7
+    #define error_correction_level 1
+    #define data_type 3
+    #define mask_type 3
+    // color parameters
+    #define red 0
+    #define green 0
+    #define blue 0
+    // file name
+    #define file "QR.png"
+    #define scale 10
+
+```
+QR code version 7, ec level L, byte format, mask no. 3, color black, generated as .png file
 ## CONTRIBUTORS:
 Thanks to [radubig](https://github.com/radubig) for fixing memory leaks and overview.
 

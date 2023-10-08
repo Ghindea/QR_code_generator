@@ -1,7 +1,9 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 #include "header.h"
-
+/*
+    Thanks to radubig (https://github.com/radubig) for suggesting stb library implementation
+*/
 void make_PPM(char **matrix) {
     FILE *out = fopen(file, "w+");
     fprintf(out, "P6\n");

@@ -132,7 +132,7 @@ For versions >= 7 a special pattern is required to identify version information.
 </details>
 <details><summary> Step 5: generate image based on matrix        </summary>
 <br>
-Currently the only image format that can be generated is .pmm. Its structure is quite simple:
+Currently 3 image formats can be generated, the simplest one being .pmm. It is structured as it follows:
 
 >       P6              # magic number 
 >       115 115         # image width & height
@@ -143,7 +143,7 @@ Currently the only image format that can be generated is .pmm. Its structure is 
 
 Since a QR code only has values of 0s and 1s, the .ppm file will contain only white pixels (255 255 255) and a specific color (0 0 0 - black by default). Because the dimensions of the data matrix depends on the selected version a scale variable was implemented to make images of the same size.
 
-.png image format will be implemented soon 
+.png and .jpg image formats are more complex and in this program they're implemented using [stb_image_write.h](https://github.com/nothings/stb/blob/master/stb_image_write.h) library.
 </details>
 <br>
 
